@@ -13,7 +13,6 @@ class Race:
         self._seriesID: int = seriesID
         self._round: int = round
 
-        # Fetching annual data from race_list_basic.json.
         url: str = f"https://cf.nascar.com/cacher/{raceSeason}/race_list_basic.json"
         response: json = urlopen(url)
         races: list = json.loads(response.read())
@@ -21,7 +20,7 @@ class Race:
         raceIndex: int = 0
 
 
-        # If exhibitions are not included, find the nth occurrence in for which "race_type_id" is 1.
+        # If exhibitions are not included, find the nth race for which "race_type_id" is 1.
         if not includeExhibitions:
             
             pointsRaceCounter: int = 0
@@ -39,8 +38,7 @@ class Race:
         else:
             raceIndex = round - 1
 
-        #region Fetching and assigning initial races values.
-        # Locating specific race information basic on other provided parameters.
+        #region Fetching and assigning initial info values.
         self._raceID: int = seriesRaces[raceIndex]["race_id"]
         self._raceName: str = seriesRaces[raceIndex]["race_name"]
         self._raceTypeID: int = seriesRaces[raceIndex]["race_type_id"]
@@ -86,6 +84,7 @@ class Race:
         self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
         self._poleWinnerLaptime: time = seriesRaces[raceIndex]["pole_winner_laptime"]
         self._feed: Feed = Feed(self.season, self.seriesID, self.ID)
+
         #endregion
 
     #region Getter method properties for data retrieval from race_list_basic.json.
@@ -340,11 +339,11 @@ class Feed:
 
 if __name__ == "__main__":
 
-    # Test instantiation of Race object.
+    # Test instantiation of Race and Feed objects.
     race = Race(2025, 1, 1)
     feed = Feed(race.season, race.seriesID, race.ID)
 
-    # Race data retrieval methods.
+    #region Race data retrieval properties.
     print(race.season)
     print(race.round)
     print(race.seriesID)
@@ -392,9 +391,15 @@ if __name__ == "__main__":
     print(race.hasQualifying)
     print(race.winnerDriverID)
     print(race.poleWinnerLaptime)
+    
+    #endregion
+
+    #region Feed data retrieval properties.
     print(race.feed.stage4Laps)
     print(race.feed.results)
     print(race.feed.cautionSegments)
     print(race.feed.raceLeaders)
     print(race.feed.stageResults)
     print(race.feed.pitReports)
+
+    #endregion
