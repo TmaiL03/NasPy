@@ -85,23 +85,34 @@ class Race:
         self._hasQualifying: bool = seriesRaces[raceIndex]["has_qualifying"]
         self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
         self._poleWinnerLaptime: time = seriesRaces[raceIndex]["pole_winner_laptime"]
-        # self._performance: Performance
+        self._feed: Feed = Feed(self.season, self.seriesID, self.ID)
         #endregion
 
+    #region Getter method properties for data retrieval from race_list_basic.json.
     ###########################################################################
     #                                                                         #
     #                              Getter Methods                             #
     #                                                                         #
     ###########################################################################
-
-    #region Getter method properties for data retrieval from race_list_basic.json.
+    
+    @property
+    def season(self) -> int:
+        return self._raceSeason
+    
+    @property
+    def seriesID(self) -> int:
+        return self._seriesID
 
     @property
-    def raceID(self) -> int:
+    def round(self) -> int:
+        return self._round
+
+    @property
+    def ID(self) -> int:
         return self._raceID
     
     @property
-    def raceName(self) -> str:
+    def name(self) -> str:
         return self._raceName
     
     @property
@@ -181,6 +192,10 @@ class Race:
         return self._numberOfLeadChanges
     
     @property
+    def numberOfLeaders(self) -> int:
+        return self._numberOfLeaders
+    
+    @property
     def numberOfCautions(self) -> int:
         return self._numberOfCautions
     
@@ -201,11 +216,11 @@ class Race:
         return self._marginOfVictory
     
     @property
-    def racePurse(self) -> float:
+    def purse(self) -> float:
         return self._racePurse
     
     @property
-    def raceComments(self) -> str:
+    def comments(self) -> str:
         return self._raceComments
         
     @property
@@ -268,18 +283,118 @@ class Race:
     def poleWinnerLaptime(self) -> time:
         return self._poleWinnerLaptime
     
-    # The following property is commented out because the Performance class has yet to be implemented.
+    @property
+    def feed(self):
+        return self._feed
     
-    # @property
-    # def performance(self):
-    #     return self._performance
+    #endregion
 
+class Feed:
+
+    def __init__(self, raceSeason: int, seriesID: int, raceID: int):
+        
+        url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/weekend-feed.json"
+        response: json = urlopen(url)
+        weekendData: list = json.loads(response.read())
+        raceInfo: dict = weekendData["weekend_race"][0]
+
+        self._stage4Laps: int = raceInfo["stage_4_laps"]
+        self._results: list = raceInfo["results"]
+        self._cautionSegments: list = raceInfo["caution_segments"]
+        self._raceLeaders: list = raceInfo["race_leaders"]
+        self._stageResults: list = raceInfo["stage_results"]
+        self._pitReports: list = raceInfo["pit_reports"]
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def stage4Laps(self) -> int:
+        return self._stage4Laps
+
+    @property
+    def results(self) -> list:
+        return self._results
+
+    @property
+    def cautionSegments(self) -> list:
+        return self._cautionSegments
+    
+    @property
+    def raceLeaders(self) -> list:
+        return self._raceLeaders
+
+    @property
+    def stageResults(self) -> list:
+        return self._stageResults
+
+    @property
+    def pitReports(self) -> list:
+        return self._pitReports
+    
     #endregion
 
 if __name__ == "__main__":
 
     # Test instantiation of Race object.
-    race = Race(2023, 2, 1)
+    race = Race(2025, 1, 1)
+    feed = Feed(race.season, race.seriesID, race.ID)
 
-    print(race.raceID)
-    print(race.raceName)
+    # Race data retrieval methods.
+    print(race.season)
+    print(race.round)
+    print(race.seriesID)
+    print(race.ID)
+    print(race.name)
+    print(race.raceTypeID)
+    print(race.restrictorPlate)
+    print(race.trackID)
+    print(race.trackName)
+    print(race.dateScheduled)
+    print(race.raceDate)
+    print(race.qualifyingDate)
+    print(race.tuneInDate)
+    print(race.scheduledDistance)
+    print(race.actualDistance)
+    print(race.scheduledLaps)
+    print(race.actualLaps)
+    print(race.stage1Laps)
+    print(race.stage2Laps)
+    print(race.stage3Laps)
+    print(race.carCount)
+    print(race.poleWinnerDriverID)
+    print(race.poleWinnerSpeed)
+    print(race.numberOfLeadChanges)
+    print(race.numberOfLeaders)
+    print(race.numberOfCautions)
+    print(race.numberOfCautionLaps)
+    print(race.averageSpeed)
+    print(race.totalRacetime)
+    print(race.marginOfVictory)
+    print(race.purse)
+    print(race.comments)
+    print(race.attendance)
+    print(race.infractions)
+    print(race.schedule)
+    print(race.radioBroadcaster)
+    print(race.tvBroadcaster)
+    print(race.satelliteRadioBroadcaster)
+    print(race.masterRaceID)
+    print(race.inspectionComplete)
+    print(race.playoffRound)
+    print(race.isQualifyingRace)
+    print(race.qualifyingRaceNo)
+    print(race.qualifyingRaceID)
+    print(race.hasQualifying)
+    print(race.winnerDriverID)
+    print(race.poleWinnerLaptime)
+    print(race.feed.stage4Laps)
+    print(race.feed.results)
+    print(race.feed.cautionSegments)
+    print(race.feed.raceLeaders)
+    print(race.feed.stageResults)
+    print(race.feed.pitReports)
