@@ -4,7 +4,10 @@ Holds NASCAR race performance data and all associated classes and methods for ac
 
 from urllib.request import urlopen
 import json, datetime, time
+from dataclasses import dataclass
+from Functions import parseWeekendFeedURL
 
+@dataclass
 class Race:
 
     def __init__(self, raceSeason: int, seriesID: int, round: int, includeExhibitions: bool = False):
@@ -77,10 +80,27 @@ class Race:
         self._masterRaceID: int = seriesRaces[raceIndex]["master_race_id"]
         self._inspectionComplete: bool = seriesRaces[raceIndex]["inspection_complete"]
         self._playoffRound: int = seriesRaces[raceIndex]["playoff_round"]
-        self._isQualifyingRace: bool = seriesRaces[raceIndex]["is_qualifying_race"]
-        self._qualifyingRaceNo: int = seriesRaces[raceIndex]["qualifying_race_no"]
-        self._qualifyingRaceID: int = seriesRaces[raceIndex]["qualifying_race_id"]
-        self._hasQualifying: bool = seriesRaces[raceIndex]["has_qualifying"]
+        
+        try:
+            self._isQualifyingRace: bool = seriesRaces[raceIndex]["is_qualifying_race"]
+        except KeyError:
+            self._isQualifyingRace: bool = None
+
+        try:
+            self._qualifyingRaceNo: int = seriesRaces[raceIndex]["qualifying_race_no"]
+        except KeyError:
+            self._qualifyingRaceNo: int = None
+
+        try:
+            self._qualifyingRaceID: int = seriesRaces[raceIndex]["qualifying_race_id"]
+        except KeyError:
+            self._qualifyingRaceID: int = None
+        
+        try:
+            self._hasQualifying: bool = seriesRaces[raceIndex]["has_qualifying"]
+        except KeyError:
+            self._hasQualifying: bool = None
+        
         self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
         self._poleWinnerLaptime: time = seriesRaces[raceIndex]["pole_winner_laptime"]
         self._feed: Feed = Feed(self.season, self.seriesID, self.ID)
@@ -288,22 +308,24 @@ class Race:
     
     #endregion
 
+@dataclass
 class Feed:
 
     def __init__(self, raceSeason: int, seriesID: int, raceID: int):
         
-        url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/weekend-feed.json"
-        response: json = urlopen(url)
-        weekendData: list = json.loads(response.read())
-        raceInfo: dict = weekendData["weekend_race"][0]
+        self._raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
-        self._stage4Laps: int = raceInfo["stage_4_laps"]
-        self._results: list = raceInfo["results"]
-        self._cautionSegments: list = raceInfo["caution_segments"]
-        self._raceLeaders: list = raceInfo["race_leaders"]
-        self._stageResults: list = raceInfo["stage_results"]
-        self._pitReports: list = raceInfo["pit_reports"]
-    
+        self._stage4Laps: int = self._raceInfo["stage_4_laps"]
+        # Instantiation will use a Results object once implemented.
+        self._results: list = self._raceInfo["results"]
+        # Instantiation will use a list of Caution objects once implemented.
+        self._cautionSegments: list = self._raceInfo["caution_segments"]
+        # Instantiation will use a list of Leader objects once implemented.
+        self._raceLeaders: list = self._raceInfo["race_leaders"]
+        # Instantiation will use a list of StageResult objects once implemented.
+        self._stageResults: list = self._raceInfo["stage_results"]
+        self._pitReports: list = self._raceInfo["pit_reports"]
+
     #region Getter method properties for data retrieval from weekend-feed.json.
     ###########################################################################
     #                                                                         #
@@ -337,69 +359,119 @@ class Feed:
     
     #endregion
 
+@dataclass
+class Result:
+
+    def __init__(self, raceSeason: int, seriesID: int, raceID: int):
+        
+        raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
+        results: list = raceInfo["results"]
+                
+        # self._resultID: int = 
+        # self._finishingPos: int =
+        # self._startingPos: int =
+        # self._carNumber: int =
+        # self._driverFullName: str =
+        # self._driverHomeTown: str =
+        # self._driverCity: str =
+        # self._driverState: str =
+        # self._driverCountry: str =
+        # self._teamID: int =
+        # self._teamName: str =
+        # self._qualifyingOrder: int =
+        # self._qualifyingPos: int =
+        # self._qualifyingSpeed: float =
+        # self._lapsLed: int =
+        # self._timesLed: int =
+        # self._carMake: str =
+        # self._carModel: str =
+        # self._sponsor: str =
+        # self._pointsEarned: int =
+        # self._playoffPointsEarned: int =
+        # self._lapsCompleted: int =
+        # self._finishingStatus: str =
+        # self._winnings: float =
+        # self._seriesID: int = seriesID
+        # self._raceSeason: int = raceSeason
+        # self._raceID: int = raceID
+        # self._ownerFullName: str =
+        # self._crewChiefID: int =
+        # self._crewChiefFullName: str =
+        # self._pointsPos: int =
+        # self._pointsDelta: int =
+        # self._ownerID: int =
+        # self._officialCarNumber: str =
+        # self._disqualified: bool =
+        # self._diffLaps: int =
+        # self._diffTime: time = # Returned value in milliseconds.
+        # self._pitBox: int =
+
+
 if __name__ == "__main__":
 
     # Test instantiation of Race and Feed objects.
-    race = Race(2025, 1, 1)
-    feed = Feed(race.season, race.seriesID, race.ID)
+    race = Race(2024, 1, 5)
 
     #region Race data retrieval properties.
-    print(race.season)
-    print(race.round)
-    print(race.seriesID)
-    print(race.ID)
-    print(race.name)
-    print(race.raceTypeID)
-    print(race.restrictorPlate)
-    print(race.trackID)
-    print(race.trackName)
-    print(race.dateScheduled)
-    print(race.raceDate)
-    print(race.qualifyingDate)
-    print(race.tuneInDate)
-    print(race.scheduledDistance)
-    print(race.actualDistance)
-    print(race.scheduledLaps)
-    print(race.actualLaps)
-    print(race.stage1Laps)
-    print(race.stage2Laps)
-    print(race.stage3Laps)
-    print(race.carCount)
-    print(race.poleWinnerDriverID)
-    print(race.poleWinnerSpeed)
-    print(race.numberOfLeadChanges)
-    print(race.numberOfLeaders)
-    print(race.numberOfCautions)
-    print(race.numberOfCautionLaps)
-    print(race.averageSpeed)
-    print(race.totalRacetime)
-    print(race.marginOfVictory)
-    print(race.purse)
-    print(race.comments)
-    print(race.attendance)
-    print(race.infractions)
-    print(race.schedule)
-    print(race.radioBroadcaster)
-    print(race.tvBroadcaster)
-    print(race.satelliteRadioBroadcaster)
-    print(race.masterRaceID)
-    print(race.inspectionComplete)
-    print(race.playoffRound)
-    print(race.isQualifyingRace)
-    print(race.qualifyingRaceNo)
-    print(race.qualifyingRaceID)
-    print(race.hasQualifying)
-    print(race.winnerDriverID)
-    print(race.poleWinnerLaptime)
+    # print(race.season)
+    # print(race.round)
+    # print(race.seriesID)
+    # print(race.ID)
+    # print(race.name)
+    # print(race.raceTypeID)
+    # print(race.restrictorPlate)
+    # print(race.trackID)
+    # print(race.trackName)
+    # print(race.dateScheduled)
+    # print(race.raceDate)
+    # print(race.qualifyingDate)
+    # print(race.tuneInDate)
+    # print(race.scheduledDistance)
+    # print(race.actualDistance)
+    # print(race.scheduledLaps)
+    # print(race.actualLaps)
+    # print(race.stage1Laps)
+    # print(race.stage2Laps)
+    # print(race.stage3Laps)
+    # print(race.carCount)
+    # print(race.poleWinnerDriverID)
+    # print(race.poleWinnerSpeed)
+    # print(race.numberOfLeadChanges)
+    # print(race.numberOfLeaders)
+    # print(race.numberOfCautions)
+    # print(race.numberOfCautionLaps)
+    # print(race.averageSpeed)
+    # print(race.totalRacetime)
+    # print(race.marginOfVictory)
+    # print(race.purse)
+    # print(race.comments)
+    # print(race.attendance)
+    # print(race.infractions)
+    # print(race.schedule)
+    # print(race.radioBroadcaster)
+    # print(race.tvBroadcaster)
+    # print(race.satelliteRadioBroadcaster)
+    # print(race.masterRaceID)
+    # print(race.inspectionComplete)
+    # print(race.playoffRound)
+    # print(race.isQualifyingRace)
+    # print(race.qualifyingRaceNo)
+    # print(race.qualifyingRaceID)
+    # print(race.hasQualifying)
+    # print(race.winnerDriverID)
+    # print(race.poleWinnerLaptime)
     
     #endregion
 
     #region Feed data retrieval properties.
-    print(race.feed.stage4Laps)
-    print(race.feed.results)
-    print(race.feed.cautionSegments)
-    print(race.feed.raceLeaders)
-    print(race.feed.stageResults)
-    print(race.feed.pitReports)
+    # print(race.feed.stage4Laps)
+    # print(race.feed.results)
+    # print(race.feed.cautionSegments)
+    # print(race.feed.raceLeaders)
+    # print(race.feed.stageResults)
+    # print(race.feed.pitReports)
 
     #endregion
+
+    #region Result data retrieval properties.
+    print(race.feed.results[0]["result_id"])
