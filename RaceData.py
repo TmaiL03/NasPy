@@ -316,8 +316,7 @@ class Feed:
         self._raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
         self._stage4Laps: int = self._raceInfo["stage_4_laps"]
-        # Instantiation will use a Results object once implemented.
-        self._results: list = self._raceInfo["results"]
+        self._results: list = self.buildResults(self._raceInfo["results"])
         # Instantiation will use a list of Caution objects once implemented.
         self._cautionSegments: list = self._raceInfo["caution_segments"]
         # Instantiation will use a list of Leader objects once implemented.
@@ -325,7 +324,7 @@ class Feed:
         # Instantiation will use a list of StageResult objects once implemented.
         self._stageResults: list = self._raceInfo["stage_results"]
         self._pitReports: list = self._raceInfo["pit_reports"]
-
+    
     #region Getter method properties for data retrieval from weekend-feed.json.
     ###########################################################################
     #                                                                         #
@@ -337,6 +336,7 @@ class Feed:
     def stage4Laps(self) -> int:
         return self._stage4Laps
 
+    # May adjusted such that the programmer can indicate the finishing position for which data should be retrieved.
     @property
     def results(self) -> list:
         return self._results
@@ -359,58 +359,231 @@ class Feed:
     
     #endregion
 
+    def buildResults(self, results: dict) -> list:
+
+        resultsList: list = []
+
+        for result in results:
+            resultsList.append(Result(result))
+
+        return resultsList
+
 @dataclass
 class Result:
 
-    def __init__(self, raceSeason: int, seriesID: int, raceID: int):
-        
-        raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
-        results: list = raceInfo["results"]
-                
-        # self._resultID: int = 
-        # self._finishingPos: int =
-        # self._startingPos: int =
-        # self._carNumber: int =
-        # self._driverFullName: str =
-        # self._driverHomeTown: str =
-        # self._driverCity: str =
-        # self._driverState: str =
-        # self._driverCountry: str =
-        # self._teamID: int =
-        # self._teamName: str =
-        # self._qualifyingOrder: int =
-        # self._qualifyingPos: int =
-        # self._qualifyingSpeed: float =
-        # self._lapsLed: int =
-        # self._timesLed: int =
-        # self._carMake: str =
-        # self._carModel: str =
-        # self._sponsor: str =
-        # self._pointsEarned: int =
-        # self._playoffPointsEarned: int =
-        # self._lapsCompleted: int =
-        # self._finishingStatus: str =
-        # self._winnings: float =
-        # self._seriesID: int = seriesID
-        # self._raceSeason: int = raceSeason
-        # self._raceID: int = raceID
-        # self._ownerFullName: str =
-        # self._crewChiefID: int =
-        # self._crewChiefFullName: str =
-        # self._pointsPos: int =
-        # self._pointsDelta: int =
-        # self._ownerID: int =
-        # self._officialCarNumber: str =
-        # self._disqualified: bool =
-        # self._diffLaps: int =
-        # self._diffTime: time = # Returned value in milliseconds.
-        # self._pitBox: int =
+    def __init__(self, context: dict):
+               
+        self._resultID: int = context["result_id"]
+        self._finishingPos: int = context["finishing_position"]
+        self._startingPos: int = context["starting_position"]
+        self._carNumber: str = context["car_number"]
+        self._driverFullName: str = context["driver_fullname"]
+        self._driverID: int = context["driver_id"]
+        self._driverHometown: str = context["driver_hometown"]
+        self._hometownCity: str = context["hometown_city"]
+        self._hometownState: str = context["hometown_state"]
+        self._hometownCountry: str = context["hometown_country"]
+        self._teamID: int = context["team_id"]
+        self._teamName: str = context["team_name"]
+        self._qualifyingOrder: int = context["qualifying_order"]
+        self._qualifyingPos: int = context["qualifying_position"]
+        self._qualifyingSpeed: float = context["qualifying_speed"]
+        self._lapsLed: int = context["laps_led"]
+        self._timesLed: int = context["times_led"]
+        self._carMake: str = context["car_make"]
+        self._carModel: str = context["car_model"]
+        self._sponsor: str = context["sponsor"]
+        self._pointsEarned: int = context["points_earned"]
+        self._playoffPointsEarned: int = context["playoff_points_earned"]
+        self._lapsCompleted: int = context["laps_completed"]
+        self._finishingStatus: str = context["finishing_status"]
+        self._winnings: float = context["winnings"]
+        self._seriesID: int = context["series_id"]
+        self._raceSeason: int = context["race_season"]
+        self._raceID: int = context["race_id"]
+        self._ownerFullName: str = context["owner_fullname"]
+        self._crewChiefID: int = context["crew_chief_id"]
+        self._crewChiefFullName: str = context["crew_chief_fullname"]
+        self._pointsPos: int = context["points_position"]
+        self._pointsDelta: int = context["points_delta"]
+        self._ownerID: int = context["owner_id"]
+        self._officialCarNumber: str = context["official_car_number"]
+        self._disqualified: bool = context["disqualified"]
+        self._diffLaps: int = context["diff_laps"]
+        self._diffTime: time = context["diff_time"] # Returned value in milliseconds.
+        self._pitBox: int = context["pit_box"]
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
 
+    @property
+    def resultID(self) -> int:
+        return self._resultID
+    
+    @property
+    def finishingPos(self) -> int:
+        return self._finishingPos
+    
+    @property
+    def startingPos(self) -> int:
+        return self._startingPos
+    
+    @property
+    def carNumber(self) -> str:
+        return self._carNumber
+    
+    @property
+    def driverFullName(self) -> str:
+        return self._driverFullName
+    
+    @property
+    def driverID(self) -> int:
+        return self._driverID
+    
+    @property
+    def driverHometown(self) -> str:
+        return self._driverHometown
+    
+    @property
+    def hometownCity(self) -> str:
+        return self._hometownCity
+    
+    @property
+    def hometownState(self) -> str:
+        return self._hometownState
+    
+    @property
+    def hometownCountry(self) -> str:
+        return self._hometownCountry
+    
+    @property
+    def teamID(self) -> int:
+        return self._teamID
+    
+    @property
+    def teamName(self) -> str:
+        return self._teamName
+    
+    @property
+    def qualifyingOrder(self) -> int:
+        return self._qualifyingOrder
+    
+    @property
+    def qualifyingPos(self) -> int:
+        return self._qualifyingPos
+    
+    @property
+    def qualifyingSpeed(self) -> float:
+        return self._qualifyingSpeed
+    
+    @property
+    def lapsLed(self) -> int:
+        return self._lapsLed
+    
+    @property
+    def timesLed(self) -> int:
+        return self._timesLed
+    
+    @property
+    def carMake(self) -> str:
+        return self._carMake
+    
+    @property
+    def carModel(self) -> str:
+        return self._carModel
+    
+    @property
+    def sponsor(self) -> str:
+        return self._sponsor
+    
+    @property
+    def pointsEarned(self) -> int:
+        return self._pointsEarned
+    
+    @property
+    def playoffPointsEarned(self) -> int:
+        return self._playoffPointsEarned
+    
+    @property
+    def lapsCompleted(self) -> int:
+        return self._lapsCompleted
+    
+    @property
+    def finishingStatus(self) -> str:
+        return self._finishingStatus
+    
+    @property
+    def winnings(self) -> float:
+        return self._winnings
+    
+    @property
+    def seriesID(self) -> int:
+        return self._seriesID
+    
+    @property
+    def raceSeason(self) -> int:
+        return self._raceSeason
+    
+    @property
+    def raceID(self) -> int:
+        return self._raceID
+    
+    @property
+    def ownerFullName(self) -> str:
+        return self._ownerFullName
+    
+    @property
+    def crewChiefID(self) -> int:
+        return self._crewChiefID
+    
+    @property
+    def crewChiefFullName(self) -> str:
+        return self._crewChiefFullName
+    
+    @property
+    def pointsPos(self) -> int:
+        return self._pointsPos
+    
+    @property
+    def pointsDelta(self) -> int:
+        return self._pointsDelta
+    
+    @property
+    def ownerID(self) -> int:
+        return self._ownerID
+    
+    @property
+    def officialCarNumber(self) -> str:
+        return self._officialCarNumber
+    
+    @property
+    def disqualified(self) -> bool:
+        return self._disqualified
+    
+    @property
+    def diffLaps(self) -> int:
+        return self._diffLaps
+    
+    @property
+    def diffTime(self) -> int:
+        return self._diffTime
+    
+    @property
+    def pitBox(self) -> int:
+        return self._pitBox
 
 if __name__ == "__main__":
 
     # Test instantiation of Race and Feed objects.
     race = Race(2024, 1, 5)
+    raceID = race.ID
+
+    # Obtaining first place information from the provided Race instance.
+    result: Result = race.feed.results[0]
 
     #region Race data retrieval properties.
     # print(race.season)
@@ -474,4 +647,44 @@ if __name__ == "__main__":
     #endregion
 
     #region Result data retrieval properties.
-    print(race.feed.results[0]["result_id"])
+    # print(result.resultID)
+    # print(result.finishingPos)
+    # print(result.startingPos)
+    # print(result.carNumber)
+    # print(result.driverFullName)
+    # print(result.driverID)
+    # print(result.driverHometown)
+    # print(result.hometownCity)
+    # print(result.hometownState)
+    # print(result.hometownCountry)
+    # print(result.teamID)
+    # print(result.teamName)
+    # print(result.qualifyingOrder)
+    # print(result.qualifyingPos)
+    # print(result.qualifyingSpeed)
+    # print(result.lapsLed)
+    # print(result.timesLed)
+    # print(result.carMake)
+    # print(result.carModel)
+    # print(result.sponsor)
+    # print(result.pointsEarned)
+    # print(result.playoffPointsEarned)
+    # print(result.lapsCompleted)
+    # print(result.finishingStatus)
+    # print(result.winnings)
+    # print(result.seriesID)
+    # print(result.raceSeason)
+    # print(result.raceID)
+    # print(result.ownerFullName)
+    # print(result.crewChiefID)
+    # print(result.crewChiefFullName)
+    # print(result.pointsPos)
+    # print(result.pointsDelta)
+    # print(result.ownerID)
+    # print(result.officialCarNumber)
+    # print(result.disqualified)
+    # print(result.diffLaps)
+    # print(result.diffTime)
+    # print(result.pitBox)
+
+    #endregion
