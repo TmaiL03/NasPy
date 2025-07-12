@@ -51,7 +51,13 @@ class Race:
         self._dateScheduled: datetime = seriesRaces[raceIndex]["date_scheduled"]
         self._raceDate: datetime = seriesRaces[raceIndex]["race_date"]
         self._qualifyingDate: datetime = seriesRaces[raceIndex]["qualifying_date"]
-        self._tuneInDate: datetime = seriesRaces[raceIndex]["tunein_date"]
+
+        # Introduced during the 2021 season.
+        try:
+            self._tuneInDate: datetime = seriesRaces[raceIndex]["tunein_date"]
+        except KeyError:
+            self._tuneInDate: datetime = None
+        
         self._scheduledDistance: float = seriesRaces[raceIndex]["scheduled_distance"]
         self._actualDistance: float = seriesRaces[raceIndex]["actual_distance"]
         self._scheduledLaps: int = seriesRaces[raceIndex]["scheduled_laps"]
@@ -68,40 +74,82 @@ class Race:
         self._numberOfCautionLaps: int = seriesRaces[raceIndex]["number_of_caution_laps"]
         self._averageSpeed: float = seriesRaces[raceIndex]["average_speed"]
         self._totalRaceTime: time = seriesRaces[raceIndex]["total_race_time"]
-        self._marginOfVictory: float = seriesRaces[raceIndex]["margin_of_victory"]
+
+        # Introduced during the 2018 season.
+        try:
+            self._marginOfVictory: float = seriesRaces[raceIndex]["margin_of_victory"]
+        except KeyError:
+            self._marginOfVictory: float = None
+        
         self._racePurse: float = seriesRaces[raceIndex]["race_purse"]
         self._raceComments: str = seriesRaces[raceIndex]["race_comments"]
         self._attendance: int = seriesRaces[raceIndex]["attendance"]
-        self._infractions: list = seriesRaces[raceIndex]["infractions"]
-        self._schedule: list = seriesRaces[raceIndex]["schedule"]
+
+        # Introduced during the 2020 season.
+        try:
+            self._infractions: list = seriesRaces[raceIndex]["infractions"]
+        except KeyError:
+            self._infractions: list = None
+        
+        # Introduced during the 2021 season.
+        try:
+            self._schedule: list = seriesRaces[raceIndex]["schedule"]
+        except KeyError:
+            self._schedule: list = None
+        
         self._radioBroadcaster: str = seriesRaces[raceIndex]["radio_broadcaster"]
         self._tvBroadcaster: str = seriesRaces[raceIndex]["television_broadcaster"]
-        self._satelliteRadioBroadcaster: str = seriesRaces[raceIndex]["satellite_radio_broadcaster"]
-        self._masterRaceID: int = seriesRaces[raceIndex]["master_race_id"]
-        self._inspectionComplete: bool = seriesRaces[raceIndex]["inspection_complete"]
-        self._playoffRound: int = seriesRaces[raceIndex]["playoff_round"]
+
+        # Introduced during the 2022 season.
+        try:
+            self._satelliteRadioBroadcaster: str = seriesRaces[raceIndex]["satellite_radio_broadcaster"]
+        except KeyError:
+            self._satelliteRadioBroadcaster: str = None
         
+        self._masterRaceID: int = seriesRaces[raceIndex]["master_race_id"]
+        
+        # Introduced during the 2019 season.
+        try:
+            self._inspectionComplete: bool = seriesRaces[raceIndex]["inspection_complete"]
+        except KeyError:
+            self._inspectionComplete: bool = None
+
+        # Introduced during 2020 season.
+        try:
+            self._playoffRound: int = seriesRaces[raceIndex]["playoff_round"]
+        except KeyError:
+            self._playoffRound: int = None
+
+        # Introduced during the 2021 season.
         try:
             self._isQualifyingRace: bool = seriesRaces[raceIndex]["is_qualifying_race"]
         except KeyError:
             self._isQualifyingRace: bool = None
 
+        # Introduced during the 2021 season.
         try:
             self._qualifyingRaceNo: int = seriesRaces[raceIndex]["qualifying_race_no"]
         except KeyError:
             self._qualifyingRaceNo: int = None
 
+        # Introduced during the 2021 season.
         try:
             self._qualifyingRaceID: int = seriesRaces[raceIndex]["qualifying_race_id"]
         except KeyError:
             self._qualifyingRaceID: int = None
         
+        # Introduced during the 2021 season.
         try:
             self._hasQualifying: bool = seriesRaces[raceIndex]["has_qualifying"]
         except KeyError:
             self._hasQualifying: bool = None
         
-        self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
+        # Introduced during the 2020 season.
+        try:
+            self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
+        except KeyError:
+            self._winnerDriverID: int = None
+        
         self._poleWinnerLaptime: time = seriesRaces[raceIndex]["pole_winner_laptime"]
         self._feed: Feed = Feed(self.season, self.seriesID, self.ID)
 
@@ -315,15 +363,30 @@ class Feed:
         
         self._raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
-        self._stage4Laps: int = self._raceInfo["stage_4_laps"]
+        # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
+        try:
+            self._stage4Laps: int = self._raceInfo["stage_4_laps"]
+        except KeyError:
+            self._stage4Laps: int = None
+        
         self._results: list = self.buildResults(self._raceInfo["results"])
         # Instantiation will use a list of Caution objects once implemented.
         self._cautionSegments: list = self._raceInfo["caution_segments"]
         # Instantiation will use a list of Leader objects once implemented.
         self._raceLeaders: list = self._raceInfo["race_leaders"]
-        # Instantiation will use a list of StageResult objects once implemented.
-        self._stageResults: list = self._raceInfo["stage_results"]
-        self._pitReports: list = self._raceInfo["pit_reports"]
+
+        # Introduced during 2020 season (will need to handle specific logic for races prior to).
+        try:
+            # Instantiation will use a list of StageResult objects once implemented.
+            self._stageResults: list = self._raceInfo["stage_results"]
+        except KeyError:
+            self._stageResults: list = None
+
+        # Introduced for round 7 of the 2020 season.
+        try:
+            self._pitReports: list = self._raceInfo["pit_reports"]
+        except KeyError:
+            self._pitReports: list = None
     
     #region Getter method properties for data retrieval from weekend-feed.json.
     ###########################################################################
@@ -379,10 +442,22 @@ class Result:
         self._carNumber: str = context["car_number"]
         self._driverFullName: str = context["driver_fullname"]
         self._driverID: int = context["driver_id"]
-        self._driverHometown: str = context["driver_hometown"]
+
+        # Introduced at round 20 of 2021 season.
+        try:
+            self._driverHometown: str = context["driver_hometown"]
+        except KeyError:
+            self._driverHometown: str = None
+        
         self._hometownCity: str = context["hometown_city"]
         self._hometownState: str = context["hometown_state"]
-        self._hometownCountry: str = context["hometown_country"]
+
+        # Introduced for round 17 of the 2021 season.
+        try:
+            self._hometownCountry: str = context["hometown_country"]
+        except KeyError:
+            self._hometownCountry: str = None
+        
         self._teamID: int = context["team_id"]
         self._teamName: str = context["team_name"]
         self._qualifyingOrder: int = context["qualifying_order"]
@@ -394,7 +469,13 @@ class Result:
         self._carModel: str = context["car_model"]
         self._sponsor: str = context["sponsor"]
         self._pointsEarned: int = context["points_earned"]
-        self._playoffPointsEarned: int = context["playoff_points_earned"]
+
+        # Introduced for round 5 of the 2019 season.
+        try:
+            self._playoffPointsEarned: int = context["playoff_points_earned"]
+        except KeyError:
+            self._playoffPointsEarned: int = None
+
         self._lapsCompleted: int = context["laps_completed"]
         self._finishingStatus: str = context["finishing_status"]
         self._winnings: float = context["winnings"]
@@ -402,16 +483,42 @@ class Result:
         self._raceSeason: int = context["race_season"]
         self._raceID: int = context["race_id"]
         self._ownerFullName: str = context["owner_fullname"]
-        self._crewChiefID: int = context["crew_chief_id"]
+
+        # Introduced for round 15 of the 2021 season.
+        try:
+            self._crewChiefID: int = context["crew_chief_id"]
+        except KeyError:
+            self._crewChiefID: int = None
+        
         self._crewChiefFullName: str = context["crew_chief_fullname"]
         self._pointsPos: int = context["points_position"]
         self._pointsDelta: int = context["points_delta"]
         self._ownerID: int = context["owner_id"]
         self._officialCarNumber: str = context["official_car_number"]
-        self._disqualified: bool = context["disqualified"]
-        self._diffLaps: int = context["diff_laps"]
-        self._diffTime: time = context["diff_time"] # Returned value in milliseconds.
-        self._pitBox: int = context["pit_box"]
+
+        # Introduced during the 2020 season.
+        try:
+            self._disqualified: bool = context["disqualified"]
+        except KeyError:
+            self._disqualified: bool = None
+        
+        # Introduced during the 2020 season (Not for the Clash, but for the Duels).
+        try:
+            self._diffLaps: int = context["diff_laps"]
+        except KeyError:
+            self._diffLaps: int = None    
+        
+        # Introduced during the 2020 season (Not for the Clash, but for the Duels).
+        try:
+            self._diffTime: time = context["diff_time"] # Returned value in milliseconds.
+        except KeyError:
+            self._diffTime: time = None
+        
+        # Introduced for round <tbd> of the <tbd> season (need to go back to identify when this key was introduced).
+        try:
+            self._pitBox: int = context["pit_box"]
+        except KeyError:
+            self._pitBox: int = None
     
     #region Getter method properties for data retrieval from weekend-feed.json.
     ###########################################################################
@@ -579,11 +686,25 @@ class Result:
 if __name__ == "__main__":
 
     # Test instantiation of Race and Feed objects.
-    race = Race(2024, 1, 5)
-    raceID = race.ID
+    # race = Race(2018, 1, 1)
+    # raceID = race.ID
+    # print(race.ID)
 
     # Obtaining first place information from the provided Race instance.
-    result: Result = race.feed.results[0]
+    # result: Result = race.feed.results[0]
+
+    # Data retrieval test.
+    for year in range(2017, 2026):
+
+        for round in range(36):
+
+            try:
+                testRace = Race(year, 1, round + 1)
+                print(f"{year} {testRace.name} successfully retrieved!")
+            
+            except Exception as ex:
+                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+
 
     #region Race data retrieval properties.
     # print(race.season)

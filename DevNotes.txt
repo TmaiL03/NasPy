@@ -1,0 +1,6 @@
+- 2017 race_list_bason.json has been largely, if not entirely, overwritten with 2018 data.
+    - In this year (at least) race IDs were sequential within each series respectively.
+    - First Cup (seriesID = 1) race of 2017 has race ID 4576.
+    - First Xfinity (seriesID = 2) race of 2017 has race ID 4617.
+    - First truck (seriesID = 3) race of 2017 has race ID 4650.
+- Determine race for which the pit_box key was introduced for record keeping purposes.
