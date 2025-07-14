@@ -5,3 +5,13 @@
     - First Xfinity (seriesID = 2) race of 2017 has race ID 4617.
     - First truck (seriesID = 3) race of 2017 has race ID 4650.
 - Determine race for which the pit_box key was introduced for record keeping purposes.
+
+- Look into implementing interface for smaller classes with common build techniques.
+    - Result, Caution, and Leader (potentially more) all use same technique for build/instatiation within Feed class.
+        - Could use lambda function to condense repetitive buildResults/buildCautions/buildLeaders functions into one.
+
+Functions:
+- Within Race class:
+    - nextRace()
+    - prevRace()
+    - findDriver(str name)

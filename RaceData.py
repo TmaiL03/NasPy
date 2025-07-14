@@ -370,10 +370,8 @@ class Feed:
             self._stage4Laps: int = None
         
         self._results: list = self.buildResults(self._raceInfo["results"])
-        # Instantiation will use a list of Caution objects once implemented.
-        self._cautionSegments: list = self._raceInfo["caution_segments"]
-        # Instantiation will use a list of Leader objects once implemented.
-        self._raceLeaders: list = self._raceInfo["race_leaders"]
+        self._cautionSegments: list = self.buildCautions(self._raceInfo["caution_segments"])
+        self._raceLeaders: list = self.buildLeaders(self._raceInfo["race_leaders"])
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
         try:
@@ -399,7 +397,7 @@ class Feed:
     def stage4Laps(self) -> int:
         return self._stage4Laps
 
-    # May adjusted such that the programmer can indicate the finishing position for which data should be retrieved.
+    # May adjust such that the programmer can indicate the finishing position for which data should be retrieved.
     @property
     def results(self) -> list:
         return self._results
@@ -430,6 +428,24 @@ class Feed:
             resultsList.append(Result(result))
 
         return resultsList
+    
+    def buildCautions(self, cautions: dict) -> list:
+
+        cautionsList: list = []
+
+        for caution in cautions:
+            cautionsList.append(Caution(caution))
+        
+        return cautionsList
+
+    def buildLeaders(self, leaders: dict) -> list:
+
+        leadersList: list = []
+
+        for leader in leaders:
+            leadersList.append(Leader(leader))
+        
+        return leadersList
 
 @dataclass
 class Result:
@@ -682,28 +698,121 @@ class Result:
     @property
     def pitBox(self) -> int:
         return self._pitBox
+    
+    #endregion
+
+@dataclass
+class Caution:
+
+    def __init__(self, context: dict):
+
+        self._raceID: int = context["race_id"]
+        self._startLap: int = context["start_lap"]
+        self._endLap: int = context["end_lap"]
+        self._reason: str = context["reason"]
+        self._comment: str = context["comment"]
+        self._beneficiary: str = context["beneficiary_car_number"]
+        self._flagState: int = context["flag_state"]
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def raceID(self) -> int:
+        return self._raceID
+
+    @property
+    def startLap(self) -> int:
+        return self._startLap
+    
+    @property
+    def endLap(self) -> int:
+        return self._endLap
+    
+    @property
+    def reason(self) -> str:
+        return self._reason
+    
+    @property
+    def comment(self) -> str:
+        return self._comment
+    
+    @property
+    def beneficiary(self) -> str:
+        return self._beneficiary
+    
+    @property
+    def flagState(self) -> int:
+        return self._flagState
+    
+    #endregion
+
+@dataclass
+class Leader:
+
+    def __init__(self, context: dict):
+
+        self._startLap: int = context["start_lap"]
+        self._endLap: int = context["end_lap"]
+        self._carNumber: str = context["car_number"]
+        self._raceID: int = context["race_id"]
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def startLap(self) -> int:
+        return self._startLap
+    
+    @property
+    def endLap(self) -> int:
+        return self._endLap
+    
+    @property
+    def carNumber(self) -> str:
+        return self._carNumber
+    
+    @property
+    def raceID(self) -> int:
+        return self._raceID
+
+    #endregion
 
 if __name__ == "__main__":
 
     # Test instantiation of Race and Feed objects.
-    # race = Race(2018, 1, 1)
-    # raceID = race.ID
-    # print(race.ID)
+    race = Race(2025, 1, 1)
+    raceID = race.ID
+    print(race.ID)
 
     # Obtaining first place information from the provided Race instance.
-    # result: Result = race.feed.results[0]
+    result: Result = race.feed.results[0]
+
+    # Obtaining first caution segment of the provided Race instance.
+    caution: Caution = race.feed.cautionSegments[0]
+
+    # Obtaining the first leader of the provided Race instance.
+    leader: Leader = race.feed.raceLeaders[0]
 
     # Data retrieval test.
-    for year in range(2017, 2026):
+    # for year in range(2017, 2026):
 
-        for round in range(36):
+    #     for round in range(36):
 
-            try:
-                testRace = Race(year, 1, round + 1)
-                print(f"{year} {testRace.name} successfully retrieved!")
+    #         try:
+    #             testRace = Race(year, 1, round + 1)
+    #             print(f"{year} {testRace.name} successfully retrieved!")
             
-            except Exception as ex:
-                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+    #         except Exception as ex:
+    #             print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
 
     #region Race data retrieval properties.
@@ -807,5 +916,24 @@ if __name__ == "__main__":
     # print(result.diffLaps)
     # print(result.diffTime)
     # print(result.pitBox)
+
+    #endregion
+
+    #region Caution data retrieval properties.
+    # print(caution.raceID)
+    # print(caution.startLap)
+    # print(caution.endLap)
+    # print(caution.reason)
+    # print(caution.comment)
+    # print(caution.beneficiary)
+    # print(caution.flagState)
+
+    #endregion
+
+    #region Leader data retrieval properties.
+    # print(leader.startLap)
+    # print(leader.endLap)
+    # print(leader.carNumber)
+    # print(leader.raceID)
 
     #endregion
