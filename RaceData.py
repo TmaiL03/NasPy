@@ -5,6 +5,7 @@ Holds NASCAR race performance data and all associated classes and methods for ac
 from urllib.request import urlopen
 import json, datetime, time
 from dataclasses import dataclass
+from typing import Type, Any
 from Functions import parseWeekendFeedURL
 
 @dataclass
@@ -369,9 +370,9 @@ class Feed:
         except KeyError:
             self._stage4Laps: int = None
         
-        self._results: list = self.buildResults(self._raceInfo["results"])
-        self._cautionSegments: list = self.buildCautions(self._raceInfo["caution_segments"])
-        self._raceLeaders: list = self.buildLeaders(self._raceInfo["race_leaders"])
+        self._results: list = self.buildList(Result, self._raceInfo["results"])
+        self._cautionSegments: list = self.buildList(Caution, self._raceInfo["caution_segments"])
+        self._raceLeaders: list = self.buildList(Leader, self._raceInfo["race_leaders"])
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
         try:
@@ -420,32 +421,15 @@ class Feed:
     
     #endregion
 
-    def buildResults(self, results: dict) -> list:
+    # Used for building lists of several different object types including Results, Cautions, and Leaders.
+    def buildList(self, cls: Type[Any], dataDict: dict) -> list:
 
-        resultsList: list = []
+        objectList: list = []
 
-        for result in results:
-            resultsList.append(Result(result))
-
-        return resultsList
-    
-    def buildCautions(self, cautions: dict) -> list:
-
-        cautionsList: list = []
-
-        for caution in cautions:
-            cautionsList.append(Caution(caution))
+        for dataObject in dataDict:
+            objectList.append(cls(dataObject))
         
-        return cautionsList
-
-    def buildLeaders(self, leaders: dict) -> list:
-
-        leadersList: list = []
-
-        for leader in leaders:
-            leadersList.append(Leader(leader))
-        
-        return leadersList
+        return objectList
 
 @dataclass
 class Result:
@@ -803,16 +787,16 @@ if __name__ == "__main__":
     leader: Leader = race.feed.raceLeaders[0]
 
     # Data retrieval test.
-    # for year in range(2017, 2026):
+    for year in range(2017, 2026):
 
-    #     for round in range(36):
+        for round in range(36):
 
-    #         try:
-    #             testRace = Race(year, 1, round + 1)
-    #             print(f"{year} {testRace.name} successfully retrieved!")
+            try:
+                testRace = Race(year, 1, round + 1)
+                print(f"{year} {testRace.name} successfully retrieved!")
             
-    #         except Exception as ex:
-    #             print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+            except Exception as ex:
+                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
 
     #region Race data retrieval properties.
