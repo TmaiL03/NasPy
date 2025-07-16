@@ -376,10 +376,10 @@ class Feed:
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
         try:
-            # Instantiation will use a list of StageResult objects once implemented.
-            self._stageResults: list = self._raceInfo["stage_results"]
+            # Instantiation will use a list of Stage objects once implemented.
+            self._stages: list = self.buildList(Stage, self._raceInfo["stage_results"])
         except KeyError:
-            self._stageResults: list = None
+            self._stages: list = None
 
         # Introduced for round 7 of the 2020 season.
         try:
@@ -412,8 +412,8 @@ class Feed:
         return self._raceLeaders
 
     @property
-    def stageResults(self) -> list:
-        return self._stageResults
+    def stages(self) -> list:
+        return self._stages
 
     @property
     def pitReports(self) -> list:
@@ -421,7 +421,7 @@ class Feed:
     
     #endregion
 
-    # Used for building lists of several different object types including Results, Cautions, and Leaders.
+    # Used for building lists of several different object types including Results, Cautions, Leaders, and Stages.
     def buildList(self, cls: Type[Any], dataDict: dict) -> list:
 
         objectList: list = []
@@ -770,6 +770,82 @@ class Leader:
 
     #endregion
 
+@dataclass
+class Stage:
+    
+    def __init__(self, context: dict):
+
+        self._stageNumber: int = context["stage_number"]
+        self._results: list = self.buildList(StageFinisher, context["results"])
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def stageNumber(self) -> int:
+        return self._stageNumber
+    
+    @property
+    def results(self) -> list:
+        return self._results
+    
+    #endregion
+
+    # NOTE: The following function is a duplicate of the one from Feed, both could be abstracted into parent class.
+    # Used for building lists of several different object types including Results, Cautions, and Leaders.
+    def buildList(self, cls: Type[Any], dataDict: dict) -> list:
+
+        objectList: list = []
+
+        for dataObject in dataDict:
+            objectList.append(cls(dataObject))
+        
+        return objectList
+
+@dataclass
+class StageFinisher:
+
+    def __init__(self, context: dict):
+
+        self._driverFullName: str = context["driver_fullname"]
+        self._driverID: int = context["driver_id"]
+        self._carNumber: str = context["car_number"]
+        self._finishingPos: int = context["finishing_position"]
+        self._stagePts: int = context["stage_points"]
+    
+    #region Getter method properties for data retrieval from weekend-feed.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def driverFullName(self) -> str:
+        return self._driverFullName
+    
+    @property
+    def driverID(self) -> int:
+        return self._driverID
+    
+    @property
+    def carNumber(self) -> str:
+        return self._carNumber
+    
+    @property
+    def finishingPos(self) -> int:
+        return self._finishingPos
+    
+    @property
+    def stagePts(self) -> int:
+        return self._stagePts
+
+    #endregion
+
 if __name__ == "__main__":
 
     # Test instantiation of Race and Feed objects.
@@ -786,17 +862,23 @@ if __name__ == "__main__":
     # Obtaining the first leader of the provided Race instance.
     leader: Leader = race.feed.raceLeaders[0]
 
+    # Obtaining the first stage of the provided Race instance.
+    stage: Stage = race.feed.stages[0]
+
+    # Obtaining the stage winner of the provided Stage instance.
+    stageFinisher: StageFinisher = stage.results[0]
+
     # Data retrieval test.
-    for year in range(2017, 2026):
+    # for year in range(2017, 2026):
 
-        for round in range(36):
+    #     for round in range(36):
 
-            try:
-                testRace = Race(year, 1, round + 1)
-                print(f"{year} {testRace.name} successfully retrieved!")
+    #         try:
+    #             testRace = Race(year, 1, round + 1)
+    #             print(f"{year} {testRace.name} successfully retrieved!")
             
-            except Exception as ex:
-                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+    #         except Exception as ex:
+    #             print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
 
     #region Race data retrieval properties.
@@ -921,3 +1003,17 @@ if __name__ == "__main__":
     # print(leader.raceID)
 
     #endregion
+
+    #region Stage data retrieval properties.
+    # print(stage.stageNumber)
+    # for driver in stage.results:
+    #     print(driver.driverFullName)
+    
+    # #endregion
+
+    # #region StageFinisher data retrieval properties.
+    # print(stageFinisher.driverFullName)
+    # print(stageFinisher.driverID)
+    # print(stageFinisher.carNumber)
+    # print(stageFinisher.finishingPos)
+    # print(stageFinisher.stagePts)

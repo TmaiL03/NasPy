@@ -6,8 +6,12 @@
     - First truck (seriesID = 3) race of 2017 has race ID 4650.
 - Determine race for which the pit_box key was introduced for record keeping purposes.
 
+- Add overloaded constructors for Result, Caution, Leader, Stage classes (and any others that are similar) so programmers can retrieve specific data of this type using season (year), seriesID, and round (like Race and/or Feed constructors.)
+
 Functions:
 - Within Race class:
-    - nextRace()
-    - prevRace()
+    - nextRace(sameSeries = True)
+    - prevRace(sameSeries = True)
     - findDriver(str name)
+    - stageResults
+        - Just as a way to fetch results slightly more directly
