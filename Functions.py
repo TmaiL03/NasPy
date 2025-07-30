@@ -15,3 +15,11 @@ def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int) -> list:
     raceInfo: dict = weekendData["weekend_race"][0]
 
     return raceInfo
+
+def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
+
+    url: str = f"https://cf.nascar.com/cacher/live/series_{seriesID}/{raceID}/live-pit-data.json"
+    response: json = urlopen(url)
+    pitData: list = json.loads(response.read())
+
+    return pitData

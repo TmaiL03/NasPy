@@ -1,5 +1,5 @@
 - Added HTTPError handling logic.
-- 2017 race_list_bason.json has been largely, if not entirely, overwritten with 2018 data.
+- 2017 race_list_basic.json has been largely, if not entirely, overwritten with 2018 data.
     - In this year (at least) race IDs were sequential within each series respectively.
     - First Cup (seriesID = 1) race of 2017 has race ID 4576.
     - First Xfinity (seriesID = 2) race of 2017 has race ID 4617.
@@ -15,3 +15,13 @@ Functions:
     - findDriver(str name)
     - stageResults
         - Just as a way to fetch results slightly more directly
+
+PitStops.filter() takes a variable number of keyword arguments (one for each of the available attributes in PitStop) used to filter the list of PitStop objects based on the provided criteria.
+	- Initial version will allow direct matching for following attributes:
+		- Vehicle number, driver name, vehicle manufacturer, pit-in flag status, pit-out flag status, pit stop type.
+
+Remember: default value of None is falsy, meaning parameters with value of None should be filtered out of filter list prior to filtering the actual PitStop object list.
+
+ONCE THE ABOVE PITSTOP LOGIC HAS BEEN IMPLEMENTED, MOVE buildList() FUNCTION INTO SEPARATE FUNCTIONS MODULE, ALLOW FOR dataList / dataDict PARAMETER TO BE ACCEPTED AS EITHER DICT OR LIST.
+
+- Make sure to adequately test PitStops data retrieval dating back to at least 2017 (as was done with Race object). Use PitStops test that was implemented (nested in Race object test) in RaceData.py.

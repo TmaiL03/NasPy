@@ -6,7 +6,7 @@ from urllib.request import urlopen
 import json, datetime, time
 from dataclasses import dataclass
 from typing import Type, Any
-from Functions import parseWeekendFeedURL
+from Functions import parseWeekendFeedURL, parseLivePitDataURL
 
 @dataclass
 class Race:
@@ -846,9 +846,178 @@ class StageFinisher:
 
     #endregion
 
+class PitStops:
+
+    def __init__(self, seriesID: int, raceID: int):
+
+        self._pitStops: list = self.buildList(PitStop, parseLivePitDataURL(seriesID, raceID))
+    
+    #region Getter method properties for data retrieval from live-pit-data.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def pitStops(self) -> list:
+        return self._pitStops
+    
+    # NOTE: The following function is a duplicate of the one from Feed + Stage, both could be abstracted into parent class.
+    # Used for building lists of several different object types including Results, Cautions, and Leaders.
+    def buildList(self, cls: Type[Any], dataList: list) -> list:
+
+        objectList: list = []
+
+        for dataObject in dataList:
+            objectList.append(cls(dataObject))
+        
+        return objectList
+
+@dataclass
+class PitStop:
+
+    def __init__(self, context: dict):
+        
+        self._vehicleNumber: str = context["vehicle_number"]
+        self._driverName: str = context["driver_name"]
+        self._vehicleManufacturer: str = context["vehicle_manufacturer"]
+        self._leaderLap: int = context["leader_lap"]
+        self._lapCount: int = context["lap_count"]
+        self._pitInFlagStatus: int = context["pit_in_flag_status"]
+        self._pitOutFlagStatus: int = context["pit_out_flag_status"]
+        self._pitInRaceTime: float = context["pit_in_race_time"]
+        self._pitOutRaceTime: float = context["pit_out_race_time"]
+        self._totalDuration: float = context["total_duration"]
+        self._boxStopRaceTime: float = context["box_stop_race_time"]
+        self._boxLeaveRaceTime: float = context["box_leave_race_time"]
+        self._pitStopDuration: float = context["pit_stop_duration"]
+        self._inTravelDuration: float = context["in_travel_duration"]
+        self._outTravelDuration: float = context["out_travel_duration"]
+        self._pitStopType: str = context["pit_stop_type"]
+        self._leftFrontTireChanged: bool = context["left_front_tire_changed"]
+        self._leftRearTireChanged: bool = context["left_rear_tire_changed"]
+        self._rightFrontTireChanged: bool = context["right_front_tire_changed"]
+        self._rightRearTireChanged: bool = context["right_rear_tire_changed"]
+        self._previousLapTime: float = context["previous_lap_time"]
+        self._nextLapTime: float = context["next_lap_time"]
+        self._pitInRank: int = context["pit_in_rank"]
+        self._pitOutRank: int = context["pit_out_rank"]
+        self._positions_gained_lost: int = context["positions_gained_lost"]
+    
+    #region Getter method properties for data retrieval from live-pit-data.json.
+    ###########################################################################
+    #                                                                         #
+    #                              Getter Methods                             #
+    #                                                                         #
+    ###########################################################################
+
+    @property
+    def vehicleNumber(self) -> str:
+        return self._vehicleNumber
+    
+    @property
+    def driverName(self) -> str:
+        return self._driverName
+    
+    @property
+    def vehicleManufacturer(self) -> str:
+        return self._vehicleManufacturer
+    
+    @property
+    def leaderLap(self) -> int:
+        return self._leaderLap
+    
+    @property
+    def lapCount(self) -> int:
+        return self._lapCount
+    
+    @property
+    def pitInFlagStatus(self) -> int:
+        return self._pitInFlagStatus
+    
+    @property
+    def pitOutFlagStatus(self) -> int:
+        return self._pitOutFlagStatus
+    
+    @property
+    def pitInRaceTime(self) -> float:
+        return self._pitInRaceTime
+    
+    @property
+    def pitOutRaceTime(self) -> float:
+        return self._pitOutRaceTime
+    
+    @property
+    def totalDuration(self) -> float:
+        return self._totalDuration
+    
+    @property
+    def boxStopRaceTime(self) -> float:
+        return self._boxStopRaceTime
+    
+    @property
+    def boxLeaveRaceTime(self) -> float:
+        return self._boxLeaveRaceTime
+    
+    @property
+    def pitStopDuration(self) -> float:
+        return self._pitStopDuration
+    
+    @property
+    def inTravelDuration(self) -> float:
+        return self._inTravelDuration
+    
+    @property
+    def outTravelDuration(self) -> float:
+        return self._outTravelDuration
+    
+    @property
+    def pitStopType(self) -> str:
+        return self._pitStopType
+    
+    @property
+    def leftFrontTireChanged(self) -> bool:
+        return self._leftFrontTireChanged
+    
+    @property
+    def leftRearTireChanged(self) -> bool:
+        return self._leftRearTireChanged
+    
+    @property
+    def rightFrontTireChanged(self) -> bool:
+        return self._rightFrontTireChanged
+    
+    @property
+    def rightRearTireChanged(self) -> bool:
+        return self._rightRearTireChanged
+    
+    @property
+    def previousLapTime(self) -> float:
+        return self._previousLapTime
+    
+    @property
+    def nextLapTime(self) -> float:
+        return self._nextLapTime
+    
+    @property
+    def pitInRank(self) -> int:
+        return self._pitInRank
+    
+    @property
+    def pitOutRank(self) -> int:
+        return self._pitOutRank
+    
+    @property
+    def positionsGainedLost(self) -> int:
+        return self._positions_gained_lost
+    
+    #endregion
+
+
 if __name__ == "__main__":
 
-    # Test instantiation of Race and Feed objects.
+    # Test instantiation of Race object and nested objects.
     race = Race(2025, 1, 1)
     raceID = race.ID
     print(race.ID)
@@ -868,15 +1037,27 @@ if __name__ == "__main__":
     # Obtaining the stage winner of the provided Stage instance.
     stageFinisher: StageFinisher = stage.results[0]
 
+    # Obtaining the pit stops for the provided Race instance (May integrate pit stop data into Race object directly).
+    stops: PitStops = PitStops(race.seriesID, race.ID)
+
     # Data retrieval test.
     # for year in range(2017, 2026):
 
     #     for round in range(36):
 
+    #         # Testing data retrieval for Race objects.
     #         try:
     #             testRace = Race(year, 1, round + 1)
     #             print(f"{year} {testRace.name} successfully retrieved!")
-            
+
+    #             # Testing data retrieval for PitStops objects.
+    #             try:
+    #                 testPitStops = PitStops(testRace.seriesID, testRace.ID)
+    #                 print(f"Pit stops for {year} {testRace.name} successfully retrieved!")
+                
+    #             except Exception as ex:
+    #                 print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+
     #         except Exception as ex:
     #             print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
@@ -1009,11 +1190,42 @@ if __name__ == "__main__":
     # for driver in stage.results:
     #     print(driver.driverFullName)
     
-    # #endregion
+    #endregion
 
-    # #region StageFinisher data retrieval properties.
+    #region StageFinisher data retrieval properties.
     # print(stageFinisher.driverFullName)
     # print(stageFinisher.driverID)
     # print(stageFinisher.carNumber)
     # print(stageFinisher.finishingPos)
     # print(stageFinisher.stagePts)
+
+    #endregion
+
+    #region PitStop data retrival properties.
+    # print(stops.pitStops[0].vehicleNumber)
+    # print(stops.pitStops[0].driverName)
+    # print(stops.pitStops[0].vehicleManufacturer)
+    # print(stops.pitStops[0].leaderLap)
+    # print(stops.pitStops[0].lapCount)
+    # print(stops.pitStops[0].pitInFlagStatus)
+    # print(stops.pitStops[0].pitOutFlagStatus)
+    # print(stops.pitStops[0].pitInRaceTime)
+    # print(stops.pitStops[0].pitOutRaceTime)
+    # print(stops.pitStops[0].totalDuration)
+    # print(stops.pitStops[0].boxStopRaceTime)
+    # print(stops.pitStops[0].boxLeaveRaceTime)
+    # print(stops.pitStops[0].pitStopDuration) 
+    # print(stops.pitStops[0].inTravelDuration)
+    # print(stops.pitStops[0].outTravelDuration)
+    # print(stops.pitStops[0].pitStopType)
+    # print(stops.pitStops[0].leftFrontTireChanged)
+    # print(stops.pitStops[0].leftRearTireChanged)
+    # print(stops.pitStops[0].rightFrontTireChanged)
+    # print(stops.pitStops[0].rightRearTireChanged)
+    # print(stops.pitStops[0].previousLapTime)
+    # print(stops.pitStops[0].nextLapTime)
+    # print(stops.pitStops[0].pitInRank)
+    # print(stops.pitStops[0].pitOutRank)
+    # print(stops.pitStops[0].positionsGainedLost)
+
+    #endregion
