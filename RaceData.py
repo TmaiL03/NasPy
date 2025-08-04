@@ -11,13 +11,64 @@ from Functions import parseWeekendFeedURL, parseLivePitDataURL
 @dataclass
 class Race:
 
-    def __init__(self, raceSeason: int, seriesID: int, round: int, includeExhibitions: bool = False):
-        
-        self._raceSeason: int = raceSeason
-        self._seriesID: int = seriesID
-        self._round: int = round
+    season: int
+    seriesID: int
+    round: int
+    raceID: int
+    raceName: str
+    racecTypeID: int
+    restrictorPlate: bool
+    trackID: int
+    trackName: str
+    dateScheduled: datetime.datetime
+    raceDate: datetime.datetime
+    qualifyingDate: datetime.datetime
+    tuneInDate: datetime.datetime
+    scheduledDistance: float
+    actualDistance: float
+    scheduledLaps: int
+    actualLaps: int
+    stage1Laps: int
+    stage2Laps: int
+    stage3Laps: int
+    carCount: int
+    poleWinnerDriverID: int
+    poleWinnerSpeed: float
+    numberOfLeadChanges: int
+    numberOfLeaders: int
+    numberOfCautions: int
+    numberOfCautionLaps: int
+    averageSpeed: float
+    totalRaceTime: time.struct_time
+    marginOfVictory: float
+    racePurse: float
+    raceComments: str
+    attendance: int
+    infractions: list
+    schedule: list
+    radioBroadcaster: str
+    tvBroadcaster: str
+    satelliteRadioBroadcaster: str
+    masterRaceID: int
+    inspectionComplete: bool
+    playoffRound: int
+    isQualifyingRace: bool
+    qualifyingRaceNo: int
+    qualifyingRaceID: int
+    hasQualifying: bool
+    winnerDriverID: int
+    poleWinnerLaptime: time.struct_time
+    feed: "Feed"
 
-        url: str = f"https://cf.nascar.com/cacher/{raceSeason}/race_list_basic.json"
+    def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
+        
+        _sentinel: object = object()
+
+        self.season = season
+        self.seriesID = seriesID
+        self.round = round
+
+        url: str = f"https://cf.nascar.com/cacher/{season}/race_list_basic.json"
         response: json = urlopen(url)
         races: list = json.loads(response.read())
         seriesRaces: list = races[f"series_{seriesID}"]
@@ -43,319 +94,82 @@ class Race:
             raceIndex = round - 1
 
         #region Fetching and assigning initial info values.
-        self._raceID: int = seriesRaces[raceIndex]["race_id"]
-        self._raceName: str = seriesRaces[raceIndex]["race_name"]
-        self._raceTypeID: int = seriesRaces[raceIndex]["race_type_id"]
-        self._restrictorPlate: bool = seriesRaces[raceIndex]["restrictor_plate"]
-        self._trackID: int = seriesRaces[raceIndex]["track_id"]
-        self._trackName: str = seriesRaces[raceIndex]["track_name"]
-        self._dateScheduled: datetime = seriesRaces[raceIndex]["date_scheduled"]
-        self._raceDate: datetime = seriesRaces[raceIndex]["race_date"]
-        self._qualifyingDate: datetime = seriesRaces[raceIndex]["qualifying_date"]
+        self.raceID = seriesRaces[raceIndex].get("race_id", _sentinel)
+        self.raceName = seriesRaces[raceIndex].get("race_name", _sentinel)
+        self.raceTypeID = seriesRaces[raceIndex].get("race_type_id", _sentinel)
+        self.restrictorPlate = seriesRaces[raceIndex].get("restrictor_plate", _sentinel)
+        self.trackID = seriesRaces[raceIndex].get("track_id", _sentinel)
+        self.trackName = seriesRaces[raceIndex].get("track_name", _sentinel)
+        self.dateScheduled = seriesRaces[raceIndex].get("date_scheduled", _sentinel)
+        self.raceDate = seriesRaces[raceIndex].get("race_date", _sentinel)
+        self.qualifyingDate = seriesRaces[raceIndex].get("qualifying_date", _sentinel)
 
         # Introduced during the 2021 season.
-        try:
-            self._tuneInDate: datetime = seriesRaces[raceIndex]["tunein_date"]
-        except KeyError:
-            self._tuneInDate: datetime = None
+        self.tuneInDate = seriesRaces[raceIndex].get("tunein_date", _sentinel)
         
-        self._scheduledDistance: float = seriesRaces[raceIndex]["scheduled_distance"]
-        self._actualDistance: float = seriesRaces[raceIndex]["actual_distance"]
-        self._scheduledLaps: int = seriesRaces[raceIndex]["scheduled_laps"]
-        self._actualLaps: int = seriesRaces[raceIndex]["actual_laps"]
-        self._stage1Laps: int = seriesRaces[raceIndex]["stage_1_laps"]
-        self._stage2Laps: int = seriesRaces[raceIndex]["stage_2_laps"]
-        self._stage3Laps: int = seriesRaces[raceIndex]["stage_3_laps"]
-        self._carCount: int = seriesRaces[raceIndex]["number_of_cars_in_field"]
-        self._poleWinnerDriverID: int = seriesRaces[raceIndex]["pole_winner_driver_id"]
-        self._poleWinnerSpeed: float = seriesRaces[raceIndex]["pole_winner_speed"]
-        self._numberOfLeadChanges: int = seriesRaces[raceIndex]["number_of_lead_changes"]
-        self._numberOfLeaders: int = seriesRaces[raceIndex]["number_of_leaders"]
-        self._numberOfCautions: int = seriesRaces[raceIndex]["number_of_cautions"]
-        self._numberOfCautionLaps: int = seriesRaces[raceIndex]["number_of_caution_laps"]
-        self._averageSpeed: float = seriesRaces[raceIndex]["average_speed"]
-        self._totalRaceTime: time = seriesRaces[raceIndex]["total_race_time"]
+        self.scheduledDistance = seriesRaces[raceIndex].get("scheduled_distance", _sentinel)
+        self.actualDistance = seriesRaces[raceIndex].get("actual_distance", _sentinel)
+        self.scheduledLaps = seriesRaces[raceIndex].get("scheduled_laps", _sentinel)
+        self.actualLaps = seriesRaces[raceIndex].get("actual_laps", _sentinel)
+        self.stage1Laps = seriesRaces[raceIndex].get("stage_1_laps", _sentinel)
+        self.stage2Laps = seriesRaces[raceIndex].get("stage_2_laps", _sentinel)
+        self.stage3Laps = seriesRaces[raceIndex].get("stage_3_laps", _sentinel)
+        self.carCount = seriesRaces[raceIndex].get("number_of_cars_in_field", _sentinel)
+        self.poleWinnerDriverID = seriesRaces[raceIndex].get("pole_winner_driver_id", _sentinel)
+        self.poleWinnerSpeed = seriesRaces[raceIndex].get("pole_winner_speed", _sentinel)
+        self.numberOfLeadChanges = seriesRaces[raceIndex].get("number_of_lead_changes", _sentinel)
+        self.numberOfLeaders = seriesRaces[raceIndex].get("number_of_leaders", _sentinel)
+        self.numberOfCautions = seriesRaces[raceIndex].get("number_of_cautions", _sentinel)
+        self.numberOfCautionLaps = seriesRaces[raceIndex].get("number_of_caution_laps", _sentinel)
+        self.averageSpeed = seriesRaces[raceIndex].get("average_speed", _sentinel)
+        self.totalRaceTime = seriesRaces[raceIndex].get("total_race_time", _sentinel)
 
         # Introduced during the 2018 season.
-        try:
-            self._marginOfVictory: float = seriesRaces[raceIndex]["margin_of_victory"]
-        except KeyError:
-            self._marginOfVictory: float = None
+        self.marginOfVictory = seriesRaces[raceIndex].get("margin_of_victory", _sentinel)
         
-        self._racePurse: float = seriesRaces[raceIndex]["race_purse"]
-        self._raceComments: str = seriesRaces[raceIndex]["race_comments"]
-        self._attendance: int = seriesRaces[raceIndex]["attendance"]
+        self.racePurse = seriesRaces[raceIndex].get("race_purse", _sentinel)
+        self.raceComments = seriesRaces[raceIndex].get("race_comments", _sentinel)
+        self.attendance = seriesRaces[raceIndex].get("attendance", _sentinel)
 
         # Introduced during the 2020 season.
-        try:
-            self._infractions: list = seriesRaces[raceIndex]["infractions"]
-        except KeyError:
-            self._infractions: list = None
+        self.infractions = seriesRaces[raceIndex].get("infractions", _sentinel)
         
         # Introduced during the 2021 season.
-        try:
-            self._schedule: list = seriesRaces[raceIndex]["schedule"]
-        except KeyError:
-            self._schedule: list = None
+        self.schedule = seriesRaces[raceIndex].get("schedule", _sentinel)
         
-        self._radioBroadcaster: str = seriesRaces[raceIndex]["radio_broadcaster"]
-        self._tvBroadcaster: str = seriesRaces[raceIndex]["television_broadcaster"]
+        self.radioBroadcaster = seriesRaces[raceIndex].get("radio_broadcaster", _sentinel)
+        self.tvBroadcaster = seriesRaces[raceIndex].get("television_broadcaster", _sentinel)
 
         # Introduced during the 2022 season.
-        try:
-            self._satelliteRadioBroadcaster: str = seriesRaces[raceIndex]["satellite_radio_broadcaster"]
-        except KeyError:
-            self._satelliteRadioBroadcaster: str = None
+        self.satelliteRadioBroadcaster = seriesRaces[raceIndex].get("satellite_radio_broadcaster", _sentinel)
         
-        self._masterRaceID: int = seriesRaces[raceIndex]["master_race_id"]
+        self.masterRaceID = seriesRaces[raceIndex].get("master_race_id", _sentinel)
         
         # Introduced during the 2019 season.
-        try:
-            self._inspectionComplete: bool = seriesRaces[raceIndex]["inspection_complete"]
-        except KeyError:
-            self._inspectionComplete: bool = None
-
+        self.inspectionComplete = seriesRaces[raceIndex].get("inspection_complete", _sentinel)
+        
         # Introduced during 2020 season.
-        try:
-            self._playoffRound: int = seriesRaces[raceIndex]["playoff_round"]
-        except KeyError:
-            self._playoffRound: int = None
-
-        # Introduced during the 2021 season.
-        try:
-            self._isQualifyingRace: bool = seriesRaces[raceIndex]["is_qualifying_race"]
-        except KeyError:
-            self._isQualifyingRace: bool = None
-
-        # Introduced during the 2021 season.
-        try:
-            self._qualifyingRaceNo: int = seriesRaces[raceIndex]["qualifying_race_no"]
-        except KeyError:
-            self._qualifyingRaceNo: int = None
-
-        # Introduced during the 2021 season.
-        try:
-            self._qualifyingRaceID: int = seriesRaces[raceIndex]["qualifying_race_id"]
-        except KeyError:
-            self._qualifyingRaceID: int = None
+        self.playoffRound = seriesRaces[raceIndex].get("playoff_round", _sentinel)
         
         # Introduced during the 2021 season.
-        try:
-            self._hasQualifying: bool = seriesRaces[raceIndex]["has_qualifying"]
-        except KeyError:
-            self._hasQualifying: bool = None
+        self.isQualifyingRace = seriesRaces[raceIndex].get("is_qualifying_race", _sentinel)
+        
+        # Introduced during the 2021 season.
+        self.qualifyingRaceNo = seriesRaces[raceIndex].get("qualifying_race_no", _sentinel)
+        
+        # Introduced during the 2021 season.
+        self.qualifyingRaceID = seriesRaces[raceIndex].get("qualifying_race_id", _sentinel)
+        
+        # Introduced during the 2021 season.
+        self.hasQualifying = seriesRaces[raceIndex].get("has_qualifying", _sentinel)
         
         # Introduced during the 2020 season.
-        try:
-            self._winnerDriverID: int = seriesRaces[raceIndex]["winner_driver_id"]
-        except KeyError:
-            self._winnerDriverID: int = None
+        self.winnerDriverID = seriesRaces[raceIndex].get("winner_driver_id", _sentinel)
         
-        self._poleWinnerLaptime: time = seriesRaces[raceIndex]["pole_winner_laptime"]
-        self._feed: Feed = Feed(self.season, self.seriesID, self.ID)
+        self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", _sentinel)
+        self.feed = Feed(self.season, self.seriesID, self.raceID)
 
         #endregion
-
-    #region Getter method properties for data retrieval from race_list_basic.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
-    
-    @property
-    def season(self) -> int:
-        return self._raceSeason
-    
-    @property
-    def seriesID(self) -> int:
-        return self._seriesID
-
-    @property
-    def round(self) -> int:
-        return self._round
-
-    @property
-    def ID(self) -> int:
-        return self._raceID
-    
-    @property
-    def name(self) -> str:
-        return self._raceName
-    
-    @property
-    def raceTypeID(self) -> int:
-        return self._raceTypeID
-    
-    @property
-    def restrictorPlate(self) -> bool:
-        return self._restrictorPlate
-    
-    @property
-    def trackID(self) -> int:
-        return self._trackID
-    
-    @property
-    def trackName(self) -> str:
-        return self._trackName
-    
-    @property
-    def dateScheduled(self) -> datetime:
-        return self._dateScheduled
-    
-    @property
-    def raceDate(self) -> datetime:
-        return self._raceDate
-    
-    @property
-    def qualifyingDate(self) -> datetime:
-        return self._qualifyingDate
-    
-    @property
-    def tuneInDate(self) -> datetime:
-        return self._tuneInDate
-    
-    @property
-    def scheduledDistance(self) -> float:
-        return self._scheduledDistance
-    
-    @property
-    def actualDistance(self) -> float:
-        return self._actualDistance
-
-    @property
-    def scheduledLaps(self) -> int:
-        return self._scheduledLaps
-    
-    @property
-    def actualLaps(self) -> int:
-        return self._actualLaps
-    
-    @property
-    def stage1Laps(self) -> int:
-        return self._stage1Laps
-    
-    @property
-    def stage2Laps(self) -> int:
-        return self._stage2Laps
-    
-    @property
-    def stage3Laps(self) -> int:
-        return self._stage3Laps
-    
-    @property
-    def carCount(self) -> int:
-        return self._carCount
-    
-    @property
-    def poleWinnerDriverID(self) -> int:
-        return self._poleWinnerDriverID
-    
-    @property
-    def poleWinnerSpeed(self) -> float:
-        return self._poleWinnerSpeed
-    
-    @property
-    def numberOfLeadChanges(self) -> int:
-        return self._numberOfLeadChanges
-    
-    @property
-    def numberOfLeaders(self) -> int:
-        return self._numberOfLeaders
-    
-    @property
-    def numberOfCautions(self) -> int:
-        return self._numberOfCautions
-    
-    @property
-    def numberOfCautionLaps(self) -> int:
-        return self._numberOfCautionLaps
-    
-    @property
-    def averageSpeed(self) -> float:
-        return self._averageSpeed
-    
-    @property
-    def totalRacetime(self) -> time:
-        return self._totalRaceTime
-    
-    @property
-    def marginOfVictory(self) -> float:
-        return self._marginOfVictory
-    
-    @property
-    def purse(self) -> float:
-        return self._racePurse
-    
-    @property
-    def comments(self) -> str:
-        return self._raceComments
-        
-    @property
-    def attendance(self) -> int:
-        return self._attendance
-    
-    @property
-    def infractions(self) -> list:
-        return self._infractions
-
-    @property
-    def schedule(self) -> list:
-        return self._schedule
-    
-    @property
-    def radioBroadcaster(self) -> str:
-        return self._radioBroadcaster
-    
-    @property
-    def tvBroadcaster(self) -> str:
-        return self._tvBroadcaster
-    
-    @property
-    def satelliteRadioBroadcaster(self) -> str:
-        return self._satelliteRadioBroadcaster
-    
-    @property
-    def masterRaceID(self) -> int:
-        return self._masterRaceID
-
-    @property
-    def inspectionComplete(self) -> bool:
-        return self._inspectionComplete
-    
-    @property
-    def playoffRound(self) -> int:
-        return self._playoffRound
-    
-    @property
-    def isQualifyingRace(self) -> bool:
-        return self._isQualifyingRace
-    
-    @property
-    def qualifyingRaceNo(self) -> int:
-        return self._qualifyingRaceNo
-    
-    @property
-    def qualifyingRaceID(self) -> int:
-        return self._qualifyingRaceID
-    
-    @property
-    def hasQualifying(self) -> bool:
-        return self._hasQualifying
-    
-    @property
-    def winnerDriverID(self) -> int:
-        return self._winnerDriverID
-    
-    @property
-    def poleWinnerLaptime(self) -> time:
-        return self._poleWinnerLaptime
-    
-    @property
-    def feed(self):
-        return self._feed
-    
-    #endregion
 
 @dataclass
 class Feed:
@@ -1019,8 +833,6 @@ if __name__ == "__main__":
 
     # Test instantiation of Race object and nested objects.
     race = Race(2025, 1, 1)
-    raceID = race.ID
-    print(race.ID)
 
     # Obtaining first place information from the provided Race instance.
     result: Result = race.feed.results[0]
@@ -1038,36 +850,39 @@ if __name__ == "__main__":
     stageFinisher: StageFinisher = stage.results[0]
 
     # Obtaining the pit stops for the provided Race instance (May integrate pit stop data into Race object directly).
-    stops: PitStops = PitStops(race.seriesID, race.ID)
+    stops: PitStops = PitStops(race.seriesID, race.raceID)
 
     # Data retrieval test.
-    # for year in range(2017, 2026):
+    startTime = time.time()
+    for year in range(2017, 2026):
 
-    #     for round in range(36):
+        for round in range(36):
 
-    #         # Testing data retrieval for Race objects.
-    #         try:
-    #             testRace = Race(year, 1, round + 1)
-    #             print(f"{year} {testRace.name} successfully retrieved!")
+            # Testing data retrieval for Race objects.
+            try:
+                testRace = Race(year, 1, round + 1)
+                print(f"{year} {testRace.raceName} successfully retrieved!")
 
-    #             # Testing data retrieval for PitStops objects.
-    #             try:
-    #                 testPitStops = PitStops(testRace.seriesID, testRace.ID)
-    #                 print(f"Pit stops for {year} {testRace.name} successfully retrieved!")
+                # Testing data retrieval for PitStops objects.
+                try:
+                    testPitStops = PitStops(testRace.seriesID, testRace.raceID)
+                    print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
                 
-    #             except Exception as ex:
-    #                 print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+                except Exception as ex:
+                    print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
 
-    #         except Exception as ex:
-    #             print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+            except Exception as ex:
+                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
+    endTime = time.time()
+    print(f"Data retrieval took {endTime - startTime} seconds.")
 
     #region Race data retrieval properties.
     # print(race.season)
     # print(race.round)
     # print(race.seriesID)
-    # print(race.ID)
-    # print(race.name)
+    # print(race.raceID)
+    # print(race.raceName)
     # print(race.raceTypeID)
     # print(race.restrictorPlate)
     # print(race.trackID)
@@ -1091,10 +906,10 @@ if __name__ == "__main__":
     # print(race.numberOfCautions)
     # print(race.numberOfCautionLaps)
     # print(race.averageSpeed)
-    # print(race.totalRacetime)
+    # print(race.totalRaceTime)
     # print(race.marginOfVictory)
-    # print(race.purse)
-    # print(race.comments)
+    # print(race.racePurse)
+    # print(race.raceComments)
     # print(race.attendance)
     # print(race.infractions)
     # print(race.schedule)

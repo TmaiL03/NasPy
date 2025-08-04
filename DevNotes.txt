@@ -5,6 +5,8 @@
     - First Xfinity (seriesID = 2) race of 2017 has race ID 4617.
     - First truck (seriesID = 3) race of 2017 has race ID 4650.
 - Determine race for which the pit_box key was introduced for record keeping purposes.
+- Replace dictionary bracket ([]) notation for attribute fetching with .get() method. Allows for more concise KeyError handling.
+    - As second parameter of .get() call, use sentinel value to allow for differentiation between null values pulled and missing keys.
 
 - Add overloaded constructors for Result, Caution, Leader, Stage classes (and any others that are similar) so programmers can retrieve specific data of this type using season (year), seriesID, and round (like Race and/or Feed constructors.)
 
@@ -15,13 +17,19 @@ Functions:
     - findDriver(str name)
     - stageResults
         - Just as a way to fetch results slightly more directly
+    - pitstops.filter(**kwargs)
+        - Allows users to filter list of pitstops from a race by any of the attributes housed within a PitStop object (i.e. by driver name, stop type, etc.).
 
 PitStops.filter() takes a variable number of keyword arguments (one for each of the available attributes in PitStop) used to filter the list of PitStop objects based on the provided criteria.
 	- Initial version will allow direct matching for following attributes:
 		- Vehicle number, driver name, vehicle manufacturer, pit-in flag status, pit-out flag status, pit stop type.
 
+MOVE buildList() FUNCTION INTO SEPARATE FUNCTIONS MODULE, ALLOW FOR dataList / dataDict PARAMETER TO BE ACCEPTED AS EITHER DICT OR LIST.
+
 Remember: default value of None is falsy, meaning parameters with value of None should be filtered out of filter list prior to filtering the actual PitStop object list.
 
-ONCE THE ABOVE PITSTOP LOGIC HAS BEEN IMPLEMENTED, MOVE buildList() FUNCTION INTO SEPARATE FUNCTIONS MODULE, ALLOW FOR dataList / dataDict PARAMETER TO BE ACCEPTED AS EITHER DICT OR LIST.
+- Make sure to adequately test PitStops data retrieval dating backat least 2017 (as was done with Race object). Use PitStops test that was implemented (nested in Race object test) in RaceData.py. to confirm.
 
-- Make sure to adequately test PitStops data retrieval dating back to at least 2017 (as was done with Race object). Use PitStops test that was implemented (nested in Race object test) in RaceData.py.
+Full race retrieval (2017 - 2025 Coke Zero Sugar 400)
+Prior to refactoring Race object: 206.619s.
+After refactoring Race object with .get: 185.909s, 177.838s.
