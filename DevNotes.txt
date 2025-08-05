@@ -4,6 +4,7 @@
     - First Cup (seriesID = 1) race of 2017 has race ID 4576.
     - First Xfinity (seriesID = 2) race of 2017 has race ID 4617.
     - First truck (seriesID = 3) race of 2017 has race ID 4650.
+- Investigate how stage results were tracked (if at all) prior to 2020.
 - Determine race for which the pit_box key was introduced for record keeping purposes.
 - Replace dictionary bracket ([]) notation for attribute fetching with .get() method. Allows for more concise KeyError handling.
     - As second parameter of .get() call, use sentinel value to allow for differentiation between null values pulled and missing keys.
@@ -33,3 +34,7 @@ Remember: default value of None is falsy, meaning parameters with value of None 
 Full race retrieval (2017 - 2025 Coke Zero Sugar 400)
 Prior to refactoring Race object: 206.619s.
 After refactoring Race object with .get: 185.909s, 177.838s.
+    - Testing results: [175.85101175308228, 118.87170433998108, 117.80800318717957, 118.16249132156372, 118.42328810691833, 117.07364130020142, 118.55185389518738, 123.31035804748535, 116.97611117362976, 117.4377269744873]
+    - NOTE: sudden drop after first is due to @cache on parseWeekendFeedURL() function.
+After refactoring Feed object with .get + adding @cache decorator to parseLivePitDataURL() function:
+    - Testing results: [200.99301862716675, 64.95275855064392, 63.84943151473999, 62.8440260887146, 64.35030174255371, 66.4552252292633, 64.61206412315369, 74.80370903015137, 71.16882252693176, 63.68824577331543]

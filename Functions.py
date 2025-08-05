@@ -16,6 +16,7 @@ def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int) -> list:
 
     return raceInfo
 
+@cache
 def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
 
     url: str = f"https://cf.nascar.com/cacher/live/series_{seriesID}/{raceID}/live-pit-data.json"

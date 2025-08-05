@@ -174,76 +174,46 @@ class Race:
 @dataclass
 class Feed:
 
+    raceInfo: dict
+    stage4Laps: int
+    results: list
+    cautionSegments: list
+    raceLeaders: list
+    stages: list
+    pitReports: list
+
+    _sentinel: object = object()
+
     def __init__(self, raceSeason: int, seriesID: int, raceID: int):
         
-        self._raceInfo: dict = parseWeekendFeedURL(raceSeason, seriesID, raceID)
+        self.raceInfo = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
         # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
-        try:
-            self._stage4Laps: int = self._raceInfo["stage_4_laps"]
-        except KeyError:
-            self._stage4Laps: int = None
+        self.stage4Laps = self.raceInfo.get("stage_4_laps", self._sentinel)
         
-        self._results: list = self.buildList(Result, self._raceInfo["results"])
-        self._cautionSegments: list = self.buildList(Caution, self._raceInfo["caution_segments"])
-        self._raceLeaders: list = self.buildList(Leader, self._raceInfo["race_leaders"])
+        self.results = self.buildList(Result, self.raceInfo.get("results", self._sentinel))
+        self.cautionSegments = self.buildList(Caution, self.raceInfo.get("caution_segments", self._sentinel))
+        self.raceLeaders = self.buildList(Leader, self.raceInfo.get("race_leaders", self._sentinel))
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
-        try:
-            # Instantiation will use a list of Stage objects once implemented.
-            self._stages: list = self.buildList(Stage, self._raceInfo["stage_results"])
-        except KeyError:
-            self._stages: list = None
+        self.stages = self.buildList(Stage, self.raceInfo.get("stage_results", self._sentinel))
 
         # Introduced for round 7 of the 2020 season.
-        try:
-            self._pitReports: list = self._raceInfo["pit_reports"]
-        except KeyError:
-            self._pitReports: list = None
-    
-    #region Getter method properties for data retrieval from weekend-feed.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
-
-    @property
-    def stage4Laps(self) -> int:
-        return self._stage4Laps
-
-    # May adjust such that the programmer can indicate the finishing position for which data should be retrieved.
-    @property
-    def results(self) -> list:
-        return self._results
-
-    @property
-    def cautionSegments(self) -> list:
-        return self._cautionSegments
-    
-    @property
-    def raceLeaders(self) -> list:
-        return self._raceLeaders
-
-    @property
-    def stages(self) -> list:
-        return self._stages
-
-    @property
-    def pitReports(self) -> list:
-        return self._pitReports
-    
-    #endregion
+        self.pitReports = self.raceInfo.get("pit_reports", self._sentinel)
 
     # Used for building lists of several different object types including Results, Cautions, Leaders, and Stages.
-    def buildList(self, cls: Type[Any], dataDict: dict) -> list:
+    def buildList(self, cls: Type[Any], dataDict: dict | object) -> list | object:
 
-        objectList: list = []
-
-        for dataObject in dataDict:
-            objectList.append(cls(dataObject))
+        if dataDict is self._sentinel:
+            return self._sentinel
         
-        return objectList
+        else:
+            objectList: list = []
+
+            for dataObject in dataDict:
+                objectList.append(cls(dataObject))
+            
+            return objectList
 
 @dataclass
 class Result:
@@ -832,7 +802,7 @@ class PitStop:
 if __name__ == "__main__":
 
     # Test instantiation of Race object and nested objects.
-    race = Race(2025, 1, 1)
+    race = Race(2020, 1, 1)
 
     # Obtaining first place information from the provided Race instance.
     result: Result = race.feed.results[0]
@@ -850,32 +820,39 @@ if __name__ == "__main__":
     stageFinisher: StageFinisher = stage.results[0]
 
     # Obtaining the pit stops for the provided Race instance (May integrate pit stop data into Race object directly).
-    stops: PitStops = PitStops(race.seriesID, race.raceID)
+    # stops: PitStops = PitStops(race.seriesID, race.raceID)
 
     # Data retrieval test.
-    startTime = time.time()
-    for year in range(2017, 2026):
+    retrievalTimes: list = []
+    for x in range(10):
 
-        for round in range(36):
+        startTime = time.time()
+        for year in range(2017, 2026):
 
-            # Testing data retrieval for Race objects.
-            try:
-                testRace = Race(year, 1, round + 1)
-                print(f"{year} {testRace.raceName} successfully retrieved!")
+            for round in range(36):
 
-                # Testing data retrieval for PitStops objects.
+                # Testing data retrieval for Race objects.
                 try:
-                    testPitStops = PitStops(testRace.seriesID, testRace.raceID)
-                    print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
-                
+                    testRace = Race(year, 1, round + 1)
+                    print(f"{year} {testRace.raceName} successfully retrieved!")
+
+                    # Testing data retrieval for PitStops objects.
+                    try:
+                        testPitStops = PitStops(testRace.seriesID, testRace.raceID)
+                        print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
+                    
+                    except Exception as ex:
+                        print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+
                 except Exception as ex:
-                    print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+                    print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
-            except Exception as ex:
-                print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+        endTime = time.time()
+        print(f"Data retrieval took {endTime - startTime} seconds.")
+        retrievalTimes.append(endTime - startTime)
+    
+    print(retrievalTimes)
 
-    endTime = time.time()
-    print(f"Data retrieval took {endTime - startTime} seconds.")
 
     #region Race data retrieval properties.
     # print(race.season)
@@ -933,7 +910,7 @@ if __name__ == "__main__":
     # print(race.feed.results)
     # print(race.feed.cautionSegments)
     # print(race.feed.raceLeaders)
-    # print(race.feed.stageResults)
+    # print(race.feed.stages)
     # print(race.feed.pitReports)
 
     #endregion
