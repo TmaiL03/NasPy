@@ -6,10 +6,8 @@
     - First truck (seriesID = 3) race of 2017 has race ID 4650.
 - Investigate how stage results were tracked (if at all) prior to 2020.
 - Determine race for which the pit_box key was introduced for record keeping purposes.
-- Replace dictionary bracket ([]) notation for attribute fetching with .get() method. Allows for more concise KeyError handling.
-    - As second parameter of .get() call, use sentinel value to allow for differentiation between null values pulled and missing keys.
 
-- Add overloaded constructors for Result, Caution, Leader, Stage classes (and any others that are similar) so programmers can retrieve specific data of this type using season (year), seriesID, and round (like Race and/or Feed constructors.)
+- Add overloaded constructors for Result, Caution, Leader, Stage, PitStop, PitStops classes (and any others that are similar) so programmers can retrieve specific data of this type using season (year), seriesID, and round (like Race and/or Feed constructors.)
 
 Functions:
 - Within Race class:
@@ -27,10 +25,6 @@ PitStops.filter() takes a variable number of keyword arguments (one for each of 
 
 MOVE buildList() FUNCTION INTO SEPARATE FUNCTIONS MODULE, ALLOW FOR dataList / dataDict PARAMETER TO BE ACCEPTED AS EITHER DICT OR LIST.
 
-Remember: default value of None is falsy, meaning parameters with value of None should be filtered out of filter list prior to filtering the actual PitStop object list.
-
-- Make sure to adequately test PitStops data retrieval dating backat least 2017 (as was done with Race object). Use PitStops test that was implemented (nested in Race object test) in RaceData.py. to confirm.
-
 Full race retrieval (2017 - 2025 Coke Zero Sugar 400)
 Prior to refactoring Race object: 206.619s.
 After refactoring Race object with .get: 185.909s, 177.838s.
@@ -41,3 +35,6 @@ After refactoring Feed object with .get + adding @cache decorator to parseLivePi
 (NOTE: Cook Out Southern 500 race page now existent and included in iteration.)
 After refactoring Results object with .get:
     - Testing results: [172.2442111968994, 59.44237923622131, 58.97147727012634, 59.26832938194275, 61.106019258499146, 59.88838171958923, 59.217323303222656, 59.75578570365906, 68.04013752937317, 59.47891449928284]
+After refactoring PitStop and PitStops with .get:
+    - Testing results: [175.93561148643494, 62.348288774490356, 60.81791925430298, 61.74087738990784, 60.95474672317505, 59.04414129257202, 59.23519778251648, 59.43310809135437, 59.12920045852661, 59.71314859390259]
+    - NOTE: Implementing sentinel values for each of the pit stop attributes simultaneously eliminated need to manually check for missing keys.
