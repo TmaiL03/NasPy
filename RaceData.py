@@ -6,7 +6,7 @@ from urllib.request import urlopen
 import json, datetime, time
 from dataclasses import dataclass
 from typing import Type, Any
-from Functions import parseWeekendFeedURL, parseLivePitDataURL
+from Parsers import parseWeekendFeedURL, parseLivePitDataURL
 
 @dataclass
 class Race:
@@ -218,256 +218,106 @@ class Feed:
 @dataclass
 class Result:
 
+    resultID: int
+    finishingPosition: int
+    startingPosition: int
+    carNumber: str
+    driverFullname: str
+    driverID: int
+    driverHometown: str
+    hometownCity: str
+    hometownState: str
+    hometownCountry: str
+    teamID: int
+    teamName: str
+    qualifyingOrder: int
+    qualifyingPosition: int
+    qualifyingSpeed: float
+    lapsLed: int
+    timesLed: int
+    carMake: str
+    carModel: str
+    sponsor: str
+    pointsEarned: int
+    playoffPointsEarned: int
+    lapsCompleted: int
+    finishingStatus: str
+    winnings: float
+    seriesID: int
+    raceSeason: int
+    raceID: int
+    ownerFullname: str
+    crewChiefID: int
+    crewChiefFullname: str
+    pointsPosition: int
+    pointsDelta: int
+    ownerID: int
+    officialCarNumber: str
+    disqualified: bool
+    diffLaps: int
+    diffTime: int
+    pitBox: int
+
     def __init__(self, context: dict):
-               
-        self._resultID: int = context["result_id"]
-        self._finishingPos: int = context["finishing_position"]
-        self._startingPos: int = context["starting_position"]
-        self._carNumber: str = context["car_number"]
-        self._driverFullName: str = context["driver_fullname"]
-        self._driverID: int = context["driver_id"]
+
+        _sentinel: object = object()
+
+        self.resultID = context.get("result_id", _sentinel)
+        self.finishingPosition = context.get("finishing_position", _sentinel)
+        self.startingPosition = context.get("starting_position", _sentinel)
+        self.carNumber = context.get("car_number", _sentinel)
+        self.driverFullName = context.get("driver_fullname", _sentinel)
+        self.driverID = context.get("driver_id", _sentinel)
 
         # Introduced at round 20 of 2021 season.
-        try:
-            self._driverHometown: str = context["driver_hometown"]
-        except KeyError:
-            self._driverHometown: str = None
+        self.driverHometown = context.get("driver_hometown", _sentinel)
         
-        self._hometownCity: str = context["hometown_city"]
-        self._hometownState: str = context["hometown_state"]
+        self.hometownCity = context.get("hometown_city", _sentinel)
+        self.hometownState = context.get("hometown_state", _sentinel)
 
         # Introduced for round 17 of the 2021 season.
-        try:
-            self._hometownCountry: str = context["hometown_country"]
-        except KeyError:
-            self._hometownCountry: str = None
+        self.hometownCountry = context.get("hometown_country", _sentinel)
         
-        self._teamID: int = context["team_id"]
-        self._teamName: str = context["team_name"]
-        self._qualifyingOrder: int = context["qualifying_order"]
-        self._qualifyingPos: int = context["qualifying_position"]
-        self._qualifyingSpeed: float = context["qualifying_speed"]
-        self._lapsLed: int = context["laps_led"]
-        self._timesLed: int = context["times_led"]
-        self._carMake: str = context["car_make"]
-        self._carModel: str = context["car_model"]
-        self._sponsor: str = context["sponsor"]
-        self._pointsEarned: int = context["points_earned"]
+        self.teamID = context.get("team_id", _sentinel)
+        self.teamName = context.get("team_name", _sentinel)
+        self.qualifyingOrder = context.get("qualifying_order", _sentinel)
+        self.qualifyingPosition = context.get("qualifying_position", _sentinel)
+        self.qualifyingSpeed = context.get("qualifying_speed", _sentinel)
+        self.lapsLed = context.get("laps_led", _sentinel)
+        self.timesLed = context.get("times_led", _sentinel)
+        self.carMake = context.get("car_make", _sentinel)
+        self.carModel = context.get("car_model", _sentinel)
+        self.sponsor = context.get("sponsor", _sentinel)
+        self.pointsEarned = context.get("points_earned", _sentinel)
 
         # Introduced for round 5 of the 2019 season.
-        try:
-            self._playoffPointsEarned: int = context["playoff_points_earned"]
-        except KeyError:
-            self._playoffPointsEarned: int = None
+        self.playoffPointsEarned = context.get("playoff_points_earned", _sentinel)
 
-        self._lapsCompleted: int = context["laps_completed"]
-        self._finishingStatus: str = context["finishing_status"]
-        self._winnings: float = context["winnings"]
-        self._seriesID: int = context["series_id"]
-        self._raceSeason: int = context["race_season"]
-        self._raceID: int = context["race_id"]
-        self._ownerFullName: str = context["owner_fullname"]
+        self.lapsCompleted = context.get("laps_completed", _sentinel)
+        self.finishingStatus = context.get("finishing_status", _sentinel)
+        self.winnings = context.get("winnings", _sentinel)
+        self.seriesID = context.get("series_id", _sentinel)
+        self.raceSeason = context.get("race_season", _sentinel)
+        self.raceID = context.get("race_id", _sentinel)
+        self.ownerFullName = context.get("owner_fullname", _sentinel)
 
         # Introduced for round 15 of the 2021 season.
-        try:
-            self._crewChiefID: int = context["crew_chief_id"]
-        except KeyError:
-            self._crewChiefID: int = None
+        self.crewChiefID = context.get("crew_chief_id", _sentinel)
         
-        self._crewChiefFullName: str = context["crew_chief_fullname"]
-        self._pointsPos: int = context["points_position"]
-        self._pointsDelta: int = context["points_delta"]
-        self._ownerID: int = context["owner_id"]
-        self._officialCarNumber: str = context["official_car_number"]
+        self.crewChiefFullName = context.get("crew_chief_fullname", _sentinel)
+        self.pointsPosition = context.get("points_position", _sentinel)
+        self.pointsDelta = context.get("points_delta", _sentinel)
+        self.ownerID = context.get("owner_id", _sentinel)
+        self.officialCarNumber = context.get("official_car_number", _sentinel)
 
         # Introduced during the 2020 season.
-        try:
-            self._disqualified: bool = context["disqualified"]
-        except KeyError:
-            self._disqualified: bool = None
+        self.disqualified = context.get("disqualified", _sentinel)
         
         # Introduced during the 2020 season (Not for the Clash, but for the Duels).
-        try:
-            self._diffLaps: int = context["diff_laps"]
-        except KeyError:
-            self._diffLaps: int = None    
-        
-        # Introduced during the 2020 season (Not for the Clash, but for the Duels).
-        try:
-            self._diffTime: time = context["diff_time"] # Returned value in milliseconds.
-        except KeyError:
-            self._diffTime: time = None
+        self.diffTime = context.get("diff_time", _sentinel) # Returned value in milliseconds.
         
         # Introduced for round <tbd> of the <tbd> season (need to go back to identify when this key was introduced).
-        try:
-            self._pitBox: int = context["pit_box"]
-        except KeyError:
-            self._pitBox: int = None
-    
-    #region Getter method properties for data retrieval from weekend-feed.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
-
-    @property
-    def resultID(self) -> int:
-        return self._resultID
-    
-    @property
-    def finishingPos(self) -> int:
-        return self._finishingPos
-    
-    @property
-    def startingPos(self) -> int:
-        return self._startingPos
-    
-    @property
-    def carNumber(self) -> str:
-        return self._carNumber
-    
-    @property
-    def driverFullName(self) -> str:
-        return self._driverFullName
-    
-    @property
-    def driverID(self) -> int:
-        return self._driverID
-    
-    @property
-    def driverHometown(self) -> str:
-        return self._driverHometown
-    
-    @property
-    def hometownCity(self) -> str:
-        return self._hometownCity
-    
-    @property
-    def hometownState(self) -> str:
-        return self._hometownState
-    
-    @property
-    def hometownCountry(self) -> str:
-        return self._hometownCountry
-    
-    @property
-    def teamID(self) -> int:
-        return self._teamID
-    
-    @property
-    def teamName(self) -> str:
-        return self._teamName
-    
-    @property
-    def qualifyingOrder(self) -> int:
-        return self._qualifyingOrder
-    
-    @property
-    def qualifyingPos(self) -> int:
-        return self._qualifyingPos
-    
-    @property
-    def qualifyingSpeed(self) -> float:
-        return self._qualifyingSpeed
-    
-    @property
-    def lapsLed(self) -> int:
-        return self._lapsLed
-    
-    @property
-    def timesLed(self) -> int:
-        return self._timesLed
-    
-    @property
-    def carMake(self) -> str:
-        return self._carMake
-    
-    @property
-    def carModel(self) -> str:
-        return self._carModel
-    
-    @property
-    def sponsor(self) -> str:
-        return self._sponsor
-    
-    @property
-    def pointsEarned(self) -> int:
-        return self._pointsEarned
-    
-    @property
-    def playoffPointsEarned(self) -> int:
-        return self._playoffPointsEarned
-    
-    @property
-    def lapsCompleted(self) -> int:
-        return self._lapsCompleted
-    
-    @property
-    def finishingStatus(self) -> str:
-        return self._finishingStatus
-    
-    @property
-    def winnings(self) -> float:
-        return self._winnings
-    
-    @property
-    def seriesID(self) -> int:
-        return self._seriesID
-    
-    @property
-    def raceSeason(self) -> int:
-        return self._raceSeason
-    
-    @property
-    def raceID(self) -> int:
-        return self._raceID
-    
-    @property
-    def ownerFullName(self) -> str:
-        return self._ownerFullName
-    
-    @property
-    def crewChiefID(self) -> int:
-        return self._crewChiefID
-    
-    @property
-    def crewChiefFullName(self) -> str:
-        return self._crewChiefFullName
-    
-    @property
-    def pointsPos(self) -> int:
-        return self._pointsPos
-    
-    @property
-    def pointsDelta(self) -> int:
-        return self._pointsDelta
-    
-    @property
-    def ownerID(self) -> int:
-        return self._ownerID
-    
-    @property
-    def officialCarNumber(self) -> str:
-        return self._officialCarNumber
-    
-    @property
-    def disqualified(self) -> bool:
-        return self._disqualified
-    
-    @property
-    def diffLaps(self) -> int:
-        return self._diffLaps
-    
-    @property
-    def diffTime(self) -> int:
-        return self._diffTime
-    
-    @property
-    def pitBox(self) -> int:
-        return self._pitBox
-    
-    #endregion
+        self.pitBox = context.get("pit_box", _sentinel)
 
 @dataclass
 class Caution:
@@ -917,8 +767,8 @@ if __name__ == "__main__":
 
     #region Result data retrieval properties.
     # print(result.resultID)
-    # print(result.finishingPos)
-    # print(result.startingPos)
+    # print(result.finishingPosition)
+    # print(result.startingPosition)
     # print(result.carNumber)
     # print(result.driverFullName)
     # print(result.driverID)
@@ -929,7 +779,7 @@ if __name__ == "__main__":
     # print(result.teamID)
     # print(result.teamName)
     # print(result.qualifyingOrder)
-    # print(result.qualifyingPos)
+    # print(result.qualifyingPosition)
     # print(result.qualifyingSpeed)
     # print(result.lapsLed)
     # print(result.timesLed)
@@ -947,7 +797,7 @@ if __name__ == "__main__":
     # print(result.ownerFullName)
     # print(result.crewChiefID)
     # print(result.crewChiefFullName)
-    # print(result.pointsPos)
+    # print(result.pointsPosition)
     # print(result.pointsDelta)
     # print(result.ownerID)
     # print(result.officialCarNumber)
