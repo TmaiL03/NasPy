@@ -334,48 +334,30 @@ class Caution:
 
         _sentinel: object = object()
 
-        self.raceID: int = context.get("race_id", _sentinel)
-        self.startLap: int = context.get("start_lap", _sentinel)
-        self.endLap: int = context.get("end_lap", _sentinel)
-        self.reason: str = context.get("reason", _sentinel)
-        self.comment: str = context.get("comment", _sentinel)
-        self.beneficiary: str = context.get("beneficiary_car_number", _sentinel)
-        self.flagState: int = context.get("flag_state", _sentinel)
+        self.raceID = context.get("race_id", _sentinel)
+        self.startLap = context.get("start_lap", _sentinel)
+        self.endLap = context.get("end_lap", _sentinel)
+        self.reason = context.get("reason", _sentinel)
+        self.comment = context.get("comment", _sentinel)
+        self.beneficiary = context.get("beneficiary_car_number", _sentinel)
+        self.flagState = context.get("flag_state", _sentinel)
 
 @dataclass
 class Leader:
 
+    startLap: int
+    endLap: int
+    carNumber: str
+    raceID: int
+
     def __init__(self, context: dict):
 
-        self._startLap: int = context["start_lap"]
-        self._endLap: int = context["end_lap"]
-        self._carNumber: str = context["car_number"]
-        self._raceID: int = context["race_id"]
-    
-    #region Getter method properties for data retrieval from weekend-feed.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
+        _sentinel: object = object()
 
-    @property
-    def startLap(self) -> int:
-        return self._startLap
-    
-    @property
-    def endLap(self) -> int:
-        return self._endLap
-    
-    @property
-    def carNumber(self) -> str:
-        return self._carNumber
-    
-    @property
-    def raceID(self) -> int:
-        return self._raceID
-
-    #endregion
+        self.startLap = context.get("start_lap", _sentinel)
+        self.endLap = context.get("end_lap", _sentinel)
+        self.carNumber = context.get("car_number", _sentinel)
+        self.raceID = context.get("race_id", _sentinel)
 
 @dataclass
 class Stage:
