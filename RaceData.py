@@ -361,79 +361,50 @@ class Leader:
 
 @dataclass
 class Stage:
+
+    stageNumber: int
+    results: list
+
+    _sentinel: object = object()
     
     def __init__(self, context: dict):
 
-        self._stageNumber: int = context["stage_number"]
-        self._results: list = self.buildList(StageFinisher, context["results"])
-    
-    #region Getter method properties for data retrieval from weekend-feed.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
-
-    @property
-    def stageNumber(self) -> int:
-        return self._stageNumber
-    
-    @property
-    def results(self) -> list:
-        return self._results
-    
-    #endregion
+        self.stageNumber: int = context["stage_number"]
+        self.results: list = self.buildList(StageFinisher, context["results"])
 
     # NOTE: The following function is a duplicate of the one from Feed, both could be abstracted into parent class.
     # Used for building lists of several different object types including Results, Cautions, and Leaders.
-    def buildList(self, cls: Type[Any], dataDict: dict) -> list:
+    def buildList(self, cls: Type[Any], dataDict: dict | object) -> list | object:
 
-        objectList: list = []
-
-        for dataObject in dataDict:
-            objectList.append(cls(dataObject))
+        if dataDict is self._sentinel:
+            return self._sentinel
         
-        return objectList
+        else:
+            objectList: list = []
+
+            for dataObject in dataDict:
+                objectList.append(cls(dataObject))
+            
+            return objectList
 
 @dataclass
 class StageFinisher:
 
+    driverFullName: str
+    driverID: int
+    carNumber: str
+    finishingPosition: int
+    stagePoints: int
+    
     def __init__(self, context: dict):
-
-        self._driverFullName: str = context["driver_fullname"]
-        self._driverID: int = context["driver_id"]
-        self._carNumber: str = context["car_number"]
-        self._finishingPos: int = context["finishing_position"]
-        self._stagePts: int = context["stage_points"]
-    
-    #region Getter method properties for data retrieval from weekend-feed.json.
-    ###########################################################################
-    #                                                                         #
-    #                              Getter Methods                             #
-    #                                                                         #
-    ###########################################################################
-
-    @property
-    def driverFullName(self) -> str:
-        return self._driverFullName
-    
-    @property
-    def driverID(self) -> int:
-        return self._driverID
-    
-    @property
-    def carNumber(self) -> str:
-        return self._carNumber
-    
-    @property
-    def finishingPos(self) -> int:
-        return self._finishingPos
-    
-    @property
-    def stagePts(self) -> int:
-        return self._stagePts
-
-    #endregion
+        
+        _sentinel: object = object()
+        
+        self.driverFullName = context.get("driver_fullname", _sentinel)
+        self.driverID = context.get("driver_id", _sentinel)
+        self.carNumber = context.get("car_number", _sentinel)
+        self.finishingPosition = context.get("finishing_position", _sentinel)
+        self.stagePoints = context.get("stage_points", _sentinel)
 
 class PitStops:
 
@@ -793,8 +764,8 @@ if __name__ == "__main__":
     # print(stageFinisher.driverFullName)
     # print(stageFinisher.driverID)
     # print(stageFinisher.carNumber)
-    # print(stageFinisher.finishingPos)
-    # print(stageFinisher.stagePts)
+    # print(stageFinisher.finishingPosition)
+    # print(stageFinisher.stagePoints)
 
     #endregion
 

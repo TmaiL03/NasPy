@@ -38,5 +38,6 @@ After refactoring Race object with .get: 185.909s, 177.838s.
     - NOTE: sudden drop after first is due to @cache on parseWeekendFeedURL() function.
 After refactoring Feed object with .get + adding @cache decorator to parseLivePitDataURL() function:
     - Testing results: [200.99301862716675, 64.95275855064392, 63.84943151473999, 62.8440260887146, 64.35030174255371, 66.4552252292633, 64.61206412315369, 74.80370903015137, 71.16882252693176, 63.68824577331543]
+(NOTE: Cook Out Southern 500 race page now existent and included in iteration.)
 After refactoring Results object with .get:
     - Testing results: [172.2442111968994, 59.44237923622131, 58.97147727012634, 59.26832938194275, 61.106019258499146, 59.88838171958923, 59.217323303222656, 59.75578570365906, 68.04013752937317, 59.47891449928284]
