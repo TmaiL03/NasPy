@@ -23,8 +23,6 @@ PitStops.filter() takes a variable number of keyword arguments (one for each of 
 	- Initial version will allow direct matching for following attributes:
 		- Vehicle number, driver name, vehicle manufacturer, pit-in flag status, pit-out flag status, pit stop type.
 
-MOVE buildList() FUNCTION INTO SEPARATE FUNCTIONS MODULE, ALLOW FOR dataList / dataDict PARAMETER TO BE ACCEPTED AS EITHER DICT OR LIST.
-
 Full race retrieval (2017 - 2025 Coke Zero Sugar 400)
 Prior to refactoring Race object: 206.619s.
 After refactoring Race object with .get: 185.909s, 177.838s.

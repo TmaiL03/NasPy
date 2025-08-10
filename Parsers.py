@@ -1,10 +1,8 @@
 from urllib.request import urlopen
 import json
 from functools import cache
-
-'''
-Ensures that a new JSON object is only being instantiated if one does not already exist.
-'''
+from Constants import MISSING
+from typing import Type, Any
 
 @cache
 def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int) -> list:
@@ -24,3 +22,17 @@ def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
     pitData: list = json.loads(response.read())
 
     return pitData
+
+# Used for building lists of data objects of the specified class type using the provided context.
+def buildList(cls: Type[Any], dataCollection: dict | list | object) -> list | object:
+
+    if dataCollection is MISSING:
+        return MISSING
+    
+    else:
+        objectList: list = []
+
+        for dataObject in dataCollection:
+            objectList.append(cls(dataObject))
+        
+        return objectList

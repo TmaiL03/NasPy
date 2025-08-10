@@ -5,8 +5,8 @@ Holds NASCAR race performance data and all associated classes and methods for ac
 from urllib.request import urlopen
 import json, datetime, time
 from dataclasses import dataclass
-from typing import Type, Any
-from Parsers import parseWeekendFeedURL, parseLivePitDataURL
+from Parsers import parseWeekendFeedURL, parseLivePitDataURL, buildList
+from Constants import MISSING
 
 @dataclass
 class Race:
@@ -60,8 +60,6 @@ class Race:
     poleWinnerLaptime: time.struct_time
     feed: "Feed"
 
-    _sentinel: object = object()
-
     def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
 
         self.season = season
@@ -94,97 +92,82 @@ class Race:
             raceIndex = round - 1
 
         #region Fetching and assigning initial info values.
-        self.raceID = seriesRaces[raceIndex].get("race_id", self._sentinel)
-        self.raceName = seriesRaces[raceIndex].get("race_name", self._sentinel)
-        self.raceTypeID = seriesRaces[raceIndex].get("race_type_id", self._sentinel)
-        self.restrictorPlate = seriesRaces[raceIndex].get("restrictor_plate", self._sentinel)
-        self.trackID = seriesRaces[raceIndex].get("track_id", self._sentinel)
-        self.trackName = seriesRaces[raceIndex].get("track_name", self._sentinel)
-        self.dateScheduled = seriesRaces[raceIndex].get("date_scheduled", self._sentinel)
-        self.raceDate = seriesRaces[raceIndex].get("race_date", self._sentinel)
-        self.qualifyingDate = seriesRaces[raceIndex].get("qualifying_date", self._sentinel)
+        self.raceID = seriesRaces[raceIndex].get("race_id", MISSING)
+        self.raceName = seriesRaces[raceIndex].get("race_name", MISSING)
+        self.raceTypeID = seriesRaces[raceIndex].get("race_type_id", MISSING)
+        self.restrictorPlate = seriesRaces[raceIndex].get("restrictor_plate", MISSING)
+        self.trackID = seriesRaces[raceIndex].get("track_id", MISSING)
+        self.trackName = seriesRaces[raceIndex].get("track_name", MISSING)
+        self.dateScheduled = seriesRaces[raceIndex].get("date_scheduled", MISSING)
+        self.raceDate = seriesRaces[raceIndex].get("race_date", MISSING)
+        self.qualifyingDate = seriesRaces[raceIndex].get("qualifying_date", MISSING)
 
         # Introduced during the 2021 season.
-        self.tuneInDate = seriesRaces[raceIndex].get("tunein_date", self._sentinel)
+        self.tuneInDate = seriesRaces[raceIndex].get("tunein_date", MISSING)
         
-        self.scheduledDistance = seriesRaces[raceIndex].get("scheduled_distance", self._sentinel)
-        self.actualDistance = seriesRaces[raceIndex].get("actual_distance", self._sentinel)
-        self.scheduledLaps = seriesRaces[raceIndex].get("scheduled_laps", self._sentinel)
-        self.actualLaps = seriesRaces[raceIndex].get("actual_laps", self._sentinel)
-        self.stage1Laps = seriesRaces[raceIndex].get("stage_1_laps", self._sentinel)
-        self.stage2Laps = seriesRaces[raceIndex].get("stage_2_laps", self._sentinel)
-        self.stage3Laps = seriesRaces[raceIndex].get("stage_3_laps", self._sentinel)
-        self.carCount = seriesRaces[raceIndex].get("number_of_cars_in_field", self._sentinel)
-        self.poleWinnerDriverID = seriesRaces[raceIndex].get("pole_winner_driver_id", self._sentinel)
-        self.poleWinnerSpeed = seriesRaces[raceIndex].get("pole_winner_speed", self._sentinel)
-        self.numberOfLeadChanges = seriesRaces[raceIndex].get("number_of_lead_changes", self._sentinel)
-        self.numberOfLeaders = seriesRaces[raceIndex].get("number_of_leaders", self._sentinel)
-        self.numberOfCautions = seriesRaces[raceIndex].get("number_of_cautions", self._sentinel)
-        self.numberOfCautionLaps = seriesRaces[raceIndex].get("number_of_caution_laps", self._sentinel)
-        self.averageSpeed = seriesRaces[raceIndex].get("average_speed", self._sentinel)
-        self.totalRaceTime = seriesRaces[raceIndex].get("total_race_time", self._sentinel)
+        self.scheduledDistance = seriesRaces[raceIndex].get("scheduled_distance", MISSING)
+        self.actualDistance = seriesRaces[raceIndex].get("actual_distance", MISSING)
+        self.scheduledLaps = seriesRaces[raceIndex].get("scheduled_laps", MISSING)
+        self.actualLaps = seriesRaces[raceIndex].get("actual_laps", MISSING)
+        self.stage1Laps = seriesRaces[raceIndex].get("stage_1_laps", MISSING)
+        self.stage2Laps = seriesRaces[raceIndex].get("stage_2_laps", MISSING)
+        self.stage3Laps = seriesRaces[raceIndex].get("stage_3_laps", MISSING)
+        self.carCount = seriesRaces[raceIndex].get("number_of_cars_in_field", MISSING)
+        self.poleWinnerDriverID = seriesRaces[raceIndex].get("pole_winner_driver_id", MISSING)
+        self.poleWinnerSpeed = seriesRaces[raceIndex].get("pole_winner_speed", MISSING)
+        self.numberOfLeadChanges = seriesRaces[raceIndex].get("number_of_lead_changes", MISSING)
+        self.numberOfLeaders = seriesRaces[raceIndex].get("number_of_leaders", MISSING)
+        self.numberOfCautions = seriesRaces[raceIndex].get("number_of_cautions", MISSING)
+        self.numberOfCautionLaps = seriesRaces[raceIndex].get("number_of_caution_laps", MISSING)
+        self.averageSpeed = seriesRaces[raceIndex].get("average_speed", MISSING)
+        self.totalRaceTime = seriesRaces[raceIndex].get("total_race_time", MISSING)
 
         # Introduced during the 2018 season.
-        self.marginOfVictory = seriesRaces[raceIndex].get("margin_of_victory", self._sentinel)
+        self.marginOfVictory = seriesRaces[raceIndex].get("margin_of_victory", MISSING)
         
-        self.racePurse = seriesRaces[raceIndex].get("race_purse", self._sentinel)
-        self.raceComments = seriesRaces[raceIndex].get("race_comments", self._sentinel)
-        self.attendance = seriesRaces[raceIndex].get("attendance", self._sentinel)
+        self.racePurse = seriesRaces[raceIndex].get("race_purse", MISSING)
+        self.raceComments = seriesRaces[raceIndex].get("race_comments", MISSING)
+        self.attendance = seriesRaces[raceIndex].get("attendance", MISSING)
 
         # Introduced during the 2020 season.
-        self.infractions = seriesRaces[raceIndex].get("infractions", self._sentinel)
+        self.infractions = seriesRaces[raceIndex].get("infractions", MISSING)
         
         # Introduced during the 2021 season.
-        self.schedule = self.buildList(Event, seriesRaces[raceIndex].get("schedule", self._sentinel))
+        self.schedule = buildList(Event, seriesRaces[raceIndex].get("schedule", MISSING))
         
-        self.radioBroadcaster = seriesRaces[raceIndex].get("radio_broadcaster", self._sentinel)
-        self.tvBroadcaster = seriesRaces[raceIndex].get("television_broadcaster", self._sentinel)
+        self.radioBroadcaster = seriesRaces[raceIndex].get("radio_broadcaster", MISSING)
+        self.tvBroadcaster = seriesRaces[raceIndex].get("television_broadcaster", MISSING)
 
         # Introduced during the 2022 season.
-        self.satelliteRadioBroadcaster = seriesRaces[raceIndex].get("satellite_radio_broadcaster", self._sentinel)
+        self.satelliteRadioBroadcaster = seriesRaces[raceIndex].get("satellite_radio_broadcaster", MISSING)
         
-        self.masterRaceID = seriesRaces[raceIndex].get("master_race_id", self._sentinel)
+        self.masterRaceID = seriesRaces[raceIndex].get("master_race_id", MISSING)
         
         # Introduced during the 2019 season.
-        self.inspectionComplete = seriesRaces[raceIndex].get("inspection_complete", self._sentinel)
+        self.inspectionComplete = seriesRaces[raceIndex].get("inspection_complete", MISSING)
         
         # Introduced during 2020 season.
-        self.playoffRound = seriesRaces[raceIndex].get("playoff_round", self._sentinel)
+        self.playoffRound = seriesRaces[raceIndex].get("playoff_round", MISSING)
         
         # Introduced during the 2021 season.
-        self.isQualifyingRace = seriesRaces[raceIndex].get("is_qualifying_race", self._sentinel)
+        self.isQualifyingRace = seriesRaces[raceIndex].get("is_qualifying_race", MISSING)
         
         # Introduced during the 2021 season.
-        self.qualifyingRaceNo = seriesRaces[raceIndex].get("qualifying_race_no", self._sentinel)
+        self.qualifyingRaceNo = seriesRaces[raceIndex].get("qualifying_race_no", MISSING)
         
         # Introduced during the 2021 season.
-        self.qualifyingRaceID = seriesRaces[raceIndex].get("qualifying_race_id", self._sentinel)
+        self.qualifyingRaceID = seriesRaces[raceIndex].get("qualifying_race_id", MISSING)
         
         # Introduced during the 2021 season.
-        self.hasQualifying = seriesRaces[raceIndex].get("has_qualifying", self._sentinel)
+        self.hasQualifying = seriesRaces[raceIndex].get("has_qualifying", MISSING)
         
         # Introduced during the 2020 season.
-        self.winnerDriverID = seriesRaces[raceIndex].get("winner_driver_id", self._sentinel)
+        self.winnerDriverID = seriesRaces[raceIndex].get("winner_driver_id", MISSING)
         
-        self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", self._sentinel)
+        self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", MISSING)
         self.feed = Feed(self.season, self.seriesID, self.raceID)
 
         #endregion
-
-    # NOTE: The following function is a duplicate of the one from Feed + Stage, both could be abstracted into parent class.
-    # Used for building lists of several different object types including Results, Cautions, and Leaders.
-    def buildList(self, cls: Type[Any], dataList: dict | list | object) -> list | object:
-
-        if dataList is self._sentinel:
-            return self._sentinel
-        
-        else:
-            objectList: list = []
-
-            for dataObject in dataList:
-                objectList.append(cls(dataObject))
-            
-            return objectList
 
 @dataclass
 class Feed:
@@ -197,38 +180,22 @@ class Feed:
     stages: list
     pitReports: list
 
-    _sentinel: object = object()
-
     def __init__(self, raceSeason: int, seriesID: int, raceID: int):
         
         self.raceInfo = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
         # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
-        self.stage4Laps = self.raceInfo.get("stage_4_laps", self._sentinel)
+        self.stage4Laps = self.raceInfo.get("stage_4_laps", MISSING)
         
-        self.results = self.buildList(Result, self.raceInfo.get("results", self._sentinel))
-        self.cautionSegments = self.buildList(Caution, self.raceInfo.get("caution_segments", self._sentinel))
-        self.raceLeaders = self.buildList(Leader, self.raceInfo.get("race_leaders", self._sentinel))
+        self.results = buildList(Result, self.raceInfo.get("results", MISSING))
+        self.cautionSegments = buildList(Caution, self.raceInfo.get("caution_segments", MISSING))
+        self.raceLeaders = buildList(Leader, self.raceInfo.get("race_leaders", MISSING))
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
-        self.stages = self.buildList(Stage, self.raceInfo.get("stage_results", self._sentinel))
+        self.stages = buildList(Stage, self.raceInfo.get("stage_results", MISSING))
 
         # Introduced for round 7 of the 2020 season.
-        self.pitReports = self.raceInfo.get("pit_reports", self._sentinel)
-
-    # Used for building lists of several different object types including Results, Cautions, Leaders, and Stages.
-    def buildList(self, cls: Type[Any], dataDict: dict | object) -> list | object:
-
-        if dataDict is self._sentinel:
-            return self._sentinel
-        
-        else:
-            objectList: list = []
-
-            for dataObject in dataDict:
-                objectList.append(cls(dataObject))
-            
-            return objectList
+        self.pitReports = self.raceInfo.get("pit_reports", MISSING)
 
 @dataclass
 class Event:
@@ -240,12 +207,10 @@ class Event:
 
     def __init__(self, context: dict):
 
-        _sentinel: object = object()
-
-        self.eventName = context.get("event_name", _sentinel)
-        self.notes = context.get("notes", _sentinel)
-        self.startTime = context.get("start_time_utc", _sentinel)
-        self.runType = context.get("run_type", _sentinel)
+        self.eventName = context.get("event_name", MISSING)
+        self.notes = context.get("notes", MISSING)
+        self.startTime = context.get("start_time_utc", MISSING)
+        self.runType = context.get("run_type", MISSING)
 
 @dataclass
 class Result:
@@ -292,64 +257,62 @@ class Result:
 
     def __init__(self, context: dict):
 
-        _sentinel: object = object()
-
-        self.resultID = context.get("result_id", _sentinel)
-        self.finishingPosition = context.get("finishing_position", _sentinel)
-        self.startingPosition = context.get("starting_position", _sentinel)
-        self.carNumber = context.get("car_number", _sentinel)
-        self.driverFullName = context.get("driver_fullname", _sentinel)
-        self.driverID = context.get("driver_id", _sentinel)
+        self.resultID = context.get("result_id", MISSING)
+        self.finishingPosition = context.get("finishing_position", MISSING)
+        self.startingPosition = context.get("starting_position", MISSING)
+        self.carNumber = context.get("car_number", MISSING)
+        self.driverFullName = context.get("driver_fullname", MISSING)
+        self.driverID = context.get("driver_id", MISSING)
 
         # Introduced at round 20 of 2021 season.
-        self.driverHometown = context.get("driver_hometown", _sentinel)
+        self.driverHometown = context.get("driver_hometown", MISSING)
         
-        self.hometownCity = context.get("hometown_city", _sentinel)
-        self.hometownState = context.get("hometown_state", _sentinel)
+        self.hometownCity = context.get("hometown_city", MISSING)
+        self.hometownState = context.get("hometown_state", MISSING)
 
         # Introduced for round 17 of the 2021 season.
-        self.hometownCountry = context.get("hometown_country", _sentinel)
+        self.hometownCountry = context.get("hometown_country", MISSING)
         
-        self.teamID = context.get("team_id", _sentinel)
-        self.teamName = context.get("team_name", _sentinel)
-        self.qualifyingOrder = context.get("qualifying_order", _sentinel)
-        self.qualifyingPosition = context.get("qualifying_position", _sentinel)
-        self.qualifyingSpeed = context.get("qualifying_speed", _sentinel)
-        self.lapsLed = context.get("laps_led", _sentinel)
-        self.timesLed = context.get("times_led", _sentinel)
-        self.carMake = context.get("car_make", _sentinel)
-        self.carModel = context.get("car_model", _sentinel)
-        self.sponsor = context.get("sponsor", _sentinel)
-        self.pointsEarned = context.get("points_earned", _sentinel)
+        self.teamID = context.get("team_id", MISSING)
+        self.teamName = context.get("team_name", MISSING)
+        self.qualifyingOrder = context.get("qualifying_order", MISSING)
+        self.qualifyingPosition = context.get("qualifying_position", MISSING)
+        self.qualifyingSpeed = context.get("qualifying_speed", MISSING)
+        self.lapsLed = context.get("laps_led", MISSING)
+        self.timesLed = context.get("times_led", MISSING)
+        self.carMake = context.get("car_make", MISSING)
+        self.carModel = context.get("car_model", MISSING)
+        self.sponsor = context.get("sponsor", MISSING)
+        self.pointsEarned = context.get("points_earned", MISSING)
 
         # Introduced for round 5 of the 2019 season.
-        self.playoffPointsEarned = context.get("playoff_points_earned", _sentinel)
+        self.playoffPointsEarned = context.get("playoff_points_earned", MISSING)
 
-        self.lapsCompleted = context.get("laps_completed", _sentinel)
-        self.finishingStatus = context.get("finishing_status", _sentinel)
-        self.winnings = context.get("winnings", _sentinel)
-        self.seriesID = context.get("series_id", _sentinel)
-        self.raceSeason = context.get("race_season", _sentinel)
-        self.raceID = context.get("race_id", _sentinel)
-        self.ownerFullName = context.get("owner_fullname", _sentinel)
+        self.lapsCompleted = context.get("laps_completed", MISSING)
+        self.finishingStatus = context.get("finishing_status", MISSING)
+        self.winnings = context.get("winnings", MISSING)
+        self.seriesID = context.get("series_id", MISSING)
+        self.raceSeason = context.get("race_season", MISSING)
+        self.raceID = context.get("race_id", MISSING)
+        self.ownerFullName = context.get("owner_fullname", MISSING)
 
         # Introduced for round 15 of the 2021 season.
-        self.crewChiefID = context.get("crew_chief_id", _sentinel)
+        self.crewChiefID = context.get("crew_chief_id", MISSING)
         
-        self.crewChiefFullName = context.get("crew_chief_fullname", _sentinel)
-        self.pointsPosition = context.get("points_position", _sentinel)
-        self.pointsDelta = context.get("points_delta", _sentinel)
-        self.ownerID = context.get("owner_id", _sentinel)
-        self.officialCarNumber = context.get("official_car_number", _sentinel)
+        self.crewChiefFullName = context.get("crew_chief_fullname", MISSING)
+        self.pointsPosition = context.get("points_position", MISSING)
+        self.pointsDelta = context.get("points_delta", MISSING)
+        self.ownerID = context.get("owner_id", MISSING)
+        self.officialCarNumber = context.get("official_car_number", MISSING)
 
         # Introduced during the 2020 season.
-        self.disqualified = context.get("disqualified", _sentinel)
+        self.disqualified = context.get("disqualified", MISSING)
         
         # Introduced during the 2020 season (Not for the Clash, but for the Duels).
-        self.diffTime = context.get("diff_time", _sentinel) # Returned value in milliseconds.
+        self.diffTime = context.get("diff_time", MISSING) # Returned value in milliseconds.
         
         # Introduced for round <tbd> of the <tbd> season (need to go back to identify when this key was introduced).
-        self.pitBox = context.get("pit_box", _sentinel)
+        self.pitBox = context.get("pit_box", MISSING)
 
 @dataclass
 class Caution:
@@ -364,15 +327,13 @@ class Caution:
 
     def __init__(self, context: dict):
 
-        _sentinel: object = object()
-
-        self.raceID = context.get("race_id", _sentinel)
-        self.startLap = context.get("start_lap", _sentinel)
-        self.endLap = context.get("end_lap", _sentinel)
-        self.reason = context.get("reason", _sentinel)
-        self.comment = context.get("comment", _sentinel)
-        self.beneficiary = context.get("beneficiary_car_number", _sentinel)
-        self.flagState = context.get("flag_state", _sentinel)
+        self.raceID = context.get("race_id", MISSING)
+        self.startLap = context.get("start_lap", MISSING)
+        self.endLap = context.get("end_lap", MISSING)
+        self.reason = context.get("reason", MISSING)
+        self.comment = context.get("comment", MISSING)
+        self.beneficiary = context.get("beneficiary_car_number", MISSING)
+        self.flagState = context.get("flag_state", MISSING)
 
 @dataclass
 class Leader:
@@ -384,40 +345,21 @@ class Leader:
 
     def __init__(self, context: dict):
 
-        _sentinel: object = object()
-
-        self.startLap = context.get("start_lap", _sentinel)
-        self.endLap = context.get("end_lap", _sentinel)
-        self.carNumber = context.get("car_number", _sentinel)
-        self.raceID = context.get("race_id", _sentinel)
+        self.startLap = context.get("start_lap", MISSING)
+        self.endLap = context.get("end_lap", MISSING)
+        self.carNumber = context.get("car_number", MISSING)
+        self.raceID = context.get("race_id", MISSING)
 
 @dataclass
 class Stage:
 
     stageNumber: int
     results: list
-
-    _sentinel: object = object()
     
     def __init__(self, context: dict):
 
-        self.stageNumber = context.get("stage_number", self._sentinel)
-        self.results = self.buildList(StageFinisher, context.get("results", self._sentinel))
-
-    # NOTE: The following function is a duplicate of the one from Feed, both could be abstracted into parent class.
-    # Used for building lists of several different object types including Results, Cautions, and Leaders.
-    def buildList(self, cls: Type[Any], dataDict: dict | object) -> list | object:
-
-        if dataDict is self._sentinel:
-            return self._sentinel
-        
-        else:
-            objectList: list = []
-
-            for dataObject in dataDict:
-                objectList.append(cls(dataObject))
-            
-            return objectList
+        self.stageNumber = context.get("stage_number", MISSING)
+        self.results = buildList(StageFinisher, context.get("results", MISSING))
 
 @dataclass
 class StageFinisher:
@@ -430,38 +372,19 @@ class StageFinisher:
     
     def __init__(self, context: dict):
         
-        _sentinel: object = object()
-        
-        self.driverFullName = context.get("driver_fullname", _sentinel)
-        self.driverID = context.get("driver_id", _sentinel)
-        self.carNumber = context.get("car_number", _sentinel)
-        self.finishingPosition = context.get("finishing_position", _sentinel)
-        self.stagePoints = context.get("stage_points", _sentinel)
+        self.driverFullName = context.get("driver_fullname", MISSING)
+        self.driverID = context.get("driver_id", MISSING)
+        self.carNumber = context.get("car_number", MISSING)
+        self.finishingPosition = context.get("finishing_position", MISSING)
+        self.stagePoints = context.get("stage_points", MISSING)
 
 class PitStops:
 
     pitStops: list
 
-    _sentinel: object = object()
-
     def __init__(self, seriesID: int, raceID: int):
 
-        self.pitStops = self.buildList(PitStop, parseLivePitDataURL(seriesID, raceID))
-    
-    # NOTE: The following function is a duplicate of the one from Feed + Stage, both could be abstracted into parent class.
-    # Used for building lists of several different object types including Results, Cautions, and Leaders.
-    def buildList(self, cls: Type[Any], dataList: dict | list | object) -> list | object:
-
-        if dataList is self._sentinel:
-            return self._sentinel
-        
-        else:
-            objectList: list = []
-
-            for dataObject in dataList:
-                objectList.append(cls(dataObject))
-            
-            return objectList
+        self.pitStops = buildList(PitStop, parseLivePitDataURL(seriesID, raceID))
 
 @dataclass
 class PitStop:
@@ -493,34 +416,32 @@ class PitStop:
     positionsGainedLost: int
 
     def __init__(self, context: dict):
-
-        _sentinel: object = object()
         
-        self.vehicleNumber = context.get("vehicle_number", _sentinel)
-        self.driverName = context.get("driver_name", _sentinel)
-        self.vehicleManufacturer = context.get("vehicle_manufacturer", _sentinel)
-        self.leaderLap = context.get("leader_lap", _sentinel)
-        self.lapCount = context.get("lap_count", _sentinel)
-        self.pitInFlagStatus = context.get("pit_in_flag_status", _sentinel)
-        self.pitOutFlagStatus = context.get("pit_out_flag_status", _sentinel)
-        self.pitInRaceTime = context.get("pit_in_race_time", _sentinel)
-        self.pitOutRaceTime = context.get("pit_out_race_time", _sentinel)
-        self.totalDuration = context.get("total_duration", _sentinel)
-        self.boxStopRaceTime = context.get("box_stop_race_time", _sentinel)
-        self.boxLeaveRaceTime = context.get("box_leave_race_time", _sentinel)
-        self.pitStopDuration = context.get("pit_stop_duration", _sentinel)
-        self.inTravelDuration = context.get("in_travel_duration", _sentinel)
-        self.outTravelDuration = context.get("out_travel_duration", _sentinel)
-        self.pitStopType = context.get("pit_stop_type", _sentinel)
-        self.leftFrontTireChanged = context.get("left_front_tire_changed", _sentinel)
-        self.leftRearTireChanged = context.get("left_rear_tire_changed", _sentinel)
-        self.rightFrontTireChanged = context.get("right_front_tire_changed", _sentinel)
-        self.rightRearTireChanged = context.get("right_rear_tire_changed", _sentinel)
-        self.previousLapTime = context.get("previous_lap_time", _sentinel)
-        self.nextLapTime = context.get("next_lap_time", _sentinel)
-        self.pitInRank = context.get("pit_in_rank", _sentinel)
-        self.pitOutRank = context.get("pit_out_rank", _sentinel)
-        self.positionsGainedLost = context.get("positions_gained_lost", _sentinel)
+        self.vehicleNumber = context.get("vehicle_number", MISSING)
+        self.driverName = context.get("driver_name", MISSING)
+        self.vehicleManufacturer = context.get("vehicle_manufacturer", MISSING)
+        self.leaderLap = context.get("leader_lap", MISSING)
+        self.lapCount = context.get("lap_count", MISSING)
+        self.pitInFlagStatus = context.get("pit_in_flag_status", MISSING)
+        self.pitOutFlagStatus = context.get("pit_out_flag_status", MISSING)
+        self.pitInRaceTime = context.get("pit_in_race_time", MISSING)
+        self.pitOutRaceTime = context.get("pit_out_race_time", MISSING)
+        self.totalDuration = context.get("total_duration", MISSING)
+        self.boxStopRaceTime = context.get("box_stop_race_time", MISSING)
+        self.boxLeaveRaceTime = context.get("box_leave_race_time", MISSING)
+        self.pitStopDuration = context.get("pit_stop_duration", MISSING)
+        self.inTravelDuration = context.get("in_travel_duration", MISSING)
+        self.outTravelDuration = context.get("out_travel_duration", MISSING)
+        self.pitStopType = context.get("pit_stop_type", MISSING)
+        self.leftFrontTireChanged = context.get("left_front_tire_changed", MISSING)
+        self.leftRearTireChanged = context.get("left_rear_tire_changed", MISSING)
+        self.rightFrontTireChanged = context.get("right_front_tire_changed", MISSING)
+        self.rightRearTireChanged = context.get("right_rear_tire_changed", MISSING)
+        self.previousLapTime = context.get("previous_lap_time", MISSING)
+        self.nextLapTime = context.get("next_lap_time", MISSING)
+        self.pitInRank = context.get("pit_in_rank", MISSING)
+        self.pitOutRank = context.get("pit_out_rank", MISSING)
+        self.positionsGainedLost = context.get("positions_gained_lost", MISSING)
 
 if __name__ == "__main__":
 
