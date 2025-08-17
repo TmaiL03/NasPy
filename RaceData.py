@@ -59,6 +59,7 @@ class Race:
     winnerDriverID: int
     poleWinnerLaptime: time.struct_time
     feed: "Feed"
+    pitStops: list
 
     def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
 
@@ -69,7 +70,7 @@ class Race:
         url: str = f"https://cf.nascar.com/cacher/{season}/race_list_basic.json"
         response: json = urlopen(url)
         races: list = json.loads(response.read())
-        seriesRaces: list = races[f"series_{seriesID}"]
+        seriesRaces: list = races[f"series_{self.seriesID}"]
         raceIndex: int = 0
 
 
@@ -166,6 +167,7 @@ class Race:
         
         self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", MISSING)
         self.feed = Feed(self.season, self.seriesID, self.raceID)
+        self.pitStops = buildList(PitStop, parseLivePitDataURL(self.seriesID, self.raceID))
 
         #endregion
 
@@ -378,14 +380,6 @@ class StageFinisher:
         self.finishingPosition = context.get("finishing_position", MISSING)
         self.stagePoints = context.get("stage_points", MISSING)
 
-class PitStops:
-
-    pitStops: list
-
-    def __init__(self, seriesID: int, raceID: int):
-
-        self.pitStops = buildList(PitStop, parseLivePitDataURL(seriesID, raceID))
-
 @dataclass
 class PitStop:
 
@@ -467,40 +461,36 @@ if __name__ == "__main__":
     # Obtaining the stage winner of the provided Stage instance.
     stageFinisher: StageFinisher = stage.results[0]
 
-    # Obtaining the pit stops for the provided Race instance (May integrate pit stop data into Race object directly).
-    stops: PitStops = PitStops(race.seriesID, race.raceID)
-
     # Data retrieval test.
-    retrievalTimes: list = []
-    for x in range(10):
+    # retrievalTimes: list = []
+    # for x in range(10):
 
-        startTime = time.time()
-        for year in range(2017, 2026):
+    #     startTime = time.time()
+    #     for year in range(2017, 2026):
 
-            for round in range(36):
+    #         for round in range(36):
 
-                # Testing data retrieval for Race objects.
-                try:
-                    testRace = Race(year, 1, round + 1)
-                    print(f"{year} {testRace.raceName} successfully retrieved!")
+    #             # Testing data retrieval for Race objects.
+    #             try:
+    #                 testRace = Race(year, 1, round + 1)
+    #                 print(f"{year} {testRace.raceName} successfully retrieved!")
 
-                    # Testing data retrieval for PitStops objects.
-                    try:
-                        testPitStops = PitStops(testRace.seriesID, testRace.raceID)
-                        print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
+    #                 # Testing data retrieval for PitStops objects.
+    #                 try:
+    #                     testPitStops = race.pitStops
+    #                     print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
                     
-                    except Exception as ex:
-                        print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+    #                 except Exception as ex:
+    #                     print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
 
-                except Exception as ex:
-                    print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+    #             except Exception as ex:
+    #                 print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
-        endTime = time.time()
-        print(f"Data retrieval took {endTime - startTime} seconds.")
-        retrievalTimes.append(endTime - startTime)
+    #     endTime = time.time()
+    #     print(f"Data retrieval took {endTime - startTime} seconds.")
+    #     retrievalTimes.append(endTime - startTime)
     
-    print(retrievalTimes)
-
+    # print(retrievalTimes)
 
     #region Race data retrieval properties.
     # print(race.season)
@@ -550,6 +540,8 @@ if __name__ == "__main__":
     # print(race.hasQualifying)
     # print(race.winnerDriverID)
     # print(race.poleWinnerLaptime)
+    # for pit in race.pitStops:
+    #     print(pit.driverName)
     
     #endregion
 
@@ -650,30 +642,30 @@ if __name__ == "__main__":
     #endregion
 
     #region PitStop data retrival properties.
-    # print(stops.pitStops[0].vehicleNumber)
-    # print(stops.pitStops[0].driverName)
-    # print(stops.pitStops[0].vehicleManufacturer)
-    # print(stops.pitStops[0].leaderLap)
-    # print(stops.pitStops[0].lapCount)
-    # print(stops.pitStops[0].pitInFlagStatus)
-    # print(stops.pitStops[0].pitOutFlagStatus)
-    # print(stops.pitStops[0].pitInRaceTime)
-    # print(stops.pitStops[0].pitOutRaceTime)
-    # print(stops.pitStops[0].totalDuration)
-    # print(stops.pitStops[0].boxStopRaceTime)
-    # print(stops.pitStops[0].boxLeaveRaceTime)
-    # print(stops.pitStops[0].pitStopDuration) 
-    # print(stops.pitStops[0].inTravelDuration)
-    # print(stops.pitStops[0].outTravelDuration)
-    # print(stops.pitStops[0].pitStopType)
-    # print(stops.pitStops[0].leftFrontTireChanged)
-    # print(stops.pitStops[0].leftRearTireChanged)
-    # print(stops.pitStops[0].rightFrontTireChanged)
-    # print(stops.pitStops[0].rightRearTireChanged)
-    # print(stops.pitStops[0].previousLapTime)
-    # print(stops.pitStops[0].nextLapTime)
-    # print(stops.pitStops[0].pitInRank)
-    # print(stops.pitStops[0].pitOutRank)
-    # print(stops.pitStops[0].positionsGainedLost)
+    # print(race.pitStops[0].vehicleNumber)
+    # print(race.pitStops[0].driverName)
+    # print(race.pitStops[0].vehicleManufacturer)
+    # print(race.pitStops[0].leaderLap)
+    # print(race.pitStops[0].lapCount)
+    # print(race.pitStops[0].pitInFlagStatus)
+    # print(race.pitStops[0].pitOutFlagStatus)
+    # print(race.pitStops[0].pitInRaceTime)
+    # print(race.pitStops[0].pitOutRaceTime)
+    # print(race.pitStops[0].totalDuration)
+    # print(race.pitStops[0].boxStopRaceTime)
+    # print(race.pitStops[0].boxLeaveRaceTime)
+    # print(race.pitStops[0].pitStopDuration) 
+    # print(race.pitStops[0].inTravelDuration)
+    # print(race.pitStops[0].outTravelDuration)
+    # print(race.pitStops[0].pitStopType)
+    # print(race.pitStops[0].leftFrontTireChanged)
+    # print(race.pitStops[0].leftRearTireChanged)
+    # print(race.pitStops[0].rightFrontTireChanged)
+    # print(race.pitStops[0].rightRearTireChanged)
+    # print(race.pitStops[0].previousLapTime)
+    # print(race.pitStops[0].nextLapTime)
+    # print(race.pitStops[0].pitInRank)
+    # print(race.pitStops[0].pitOutRank)
+    # print(race.pitStops[0].positionsGainedLost)
 
     #endregion

@@ -36,3 +36,5 @@ After refactoring Results object with .get:
 After refactoring PitStop and PitStops with .get:
     - Testing results: [175.93561148643494, 62.348288774490356, 60.81791925430298, 61.74087738990784, 60.95474672317505, 59.04414129257202, 59.23519778251648, 59.43310809135437, 59.12920045852661, 59.71314859390259]
     - NOTE: Implementing sentinel values for each of the pit stop attributes simultaneously eliminated need to manually check for missing keys.
+After implementing Event class and refactoring buildList function and implementing universal sentinel.
+    - Testing results: [184.48848676681519, 60.84104943275452, 60.683162212371826, 60.645922899246216, 61.044455766677856, 60.184781312942505, 60.54761862754822, 60.25888109207153, 60.23845076560974, 60.22330975532532]
