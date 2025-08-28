@@ -23,6 +23,15 @@ def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
 
     return pitData
 
+def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
+
+    url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/lap-times.json"
+    response: json = urlopen(url)
+    lapTimesData: list = json.loads(response.read())
+    lapTimes: list = lapTimesData["laps"]
+
+    return lapTimes
+
 # Used for building lists of data objects of the specified class type using the provided context.
 def buildList(cls: Type[Any], dataCollection: dict | list | object) -> list | object:
 

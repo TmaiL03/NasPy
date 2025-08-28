@@ -5,7 +5,7 @@ Holds NASCAR race performance data and all associated classes and methods for ac
 from urllib.request import urlopen
 import json, datetime, time
 from dataclasses import dataclass
-from Parsers import parseWeekendFeedURL, parseLivePitDataURL, buildList
+from Parsers import parseWeekendFeedURL, parseLivePitDataURL, parseLapTimesURL, buildList
 from Constants import MISSING
 
 @dataclass
@@ -60,6 +60,7 @@ class Race:
     poleWinnerLaptime: time.struct_time
     feed: "Feed"
     pitStops: list
+    driverLaps: list
 
     def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
 
@@ -168,6 +169,7 @@ class Race:
         self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", MISSING)
         self.feed = Feed(self.season, self.seriesID, self.raceID)
         self.pitStops = buildList(PitStop, parseLivePitDataURL(self.seriesID, self.raceID))
+        self.driverLaps = buildList(DriverLaps, parseLapTimesURL(self.season, self.seriesID, self.raceID))
 
         #endregion
 
@@ -437,11 +439,31 @@ class PitStop:
         self.pitOutRank = context.get("pit_out_rank", MISSING)
         self.positionsGainedLost = context.get("positions_gained_lost", MISSING)
 
+# NOTE: Need to implement Lap class via buildList in DriverLaps.
+@dataclass
+class DriverLaps:
+
+    carNumber: str
+    fullName: str
+    manufacturer: str
+    runningPosition: int
+    driverID: int
+    #laps: Lap
+
+    def __init__(self, context: dict):
+
+        self.carNumber = context.get("Number", MISSING)
+        self.fullName = context.get("FullName", MISSING)
+        self.manufacturer = context.get("Manufacturer", MISSING)
+        self.runningPosition = context.get("RunningPos", MISSING)
+        self.driverID = context.get("NASCARDriverID", MISSING)
+        #self.laps = buildList(Lap, context.get("laps", MISSING))
+
 if __name__ == "__main__":
 
     # Test instantiation of Race object and nested objects.
     race = Race(2025, 1, 1)
-    print(race.raceID)
+    # print(race.raceID)
 
     # Obtaining first place information from the provided Race instance.
     result: Result = race.feed.results[0]
@@ -460,6 +482,9 @@ if __name__ == "__main__":
 
     # Obtaining the stage winner of the provided Stage instance.
     stageFinisher: StageFinisher = stage.results[0]
+
+    # Obtaining the first DriverLaps instance given the provided race information.
+    driverLaps: list = race.driverLaps
 
     # Data retrieval test.
     # retrievalTimes: list = []
@@ -669,3 +694,11 @@ if __name__ == "__main__":
     # print(race.pitStops[0].positionsGainedLost)
 
     #endregion
+
+    #region DriverLaps data retrieval properties.
+    specificDriverLaps: DriverLaps = driverLaps[0]
+    print(specificDriverLaps.carNumber)
+    print(specificDriverLaps.fullName)
+    print(specificDriverLaps.manufacturer)
+    print(specificDriverLaps.runningPosition)
+    print(specificDriverLaps.driverID)
