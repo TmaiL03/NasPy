@@ -439,7 +439,6 @@ class PitStop:
         self.pitOutRank = context.get("pit_out_rank", MISSING)
         self.positionsGainedLost = context.get("positions_gained_lost", MISSING)
 
-# NOTE: Need to implement Lap class via buildList in DriverLaps.
 @dataclass
 class DriverLaps:
 
@@ -448,7 +447,7 @@ class DriverLaps:
     manufacturer: str
     runningPosition: int
     driverID: int
-    #laps: Lap
+    laps: list
 
     def __init__(self, context: dict):
 
@@ -457,7 +456,22 @@ class DriverLaps:
         self.manufacturer = context.get("Manufacturer", MISSING)
         self.runningPosition = context.get("RunningPos", MISSING)
         self.driverID = context.get("NASCARDriverID", MISSING)
-        #self.laps = buildList(Lap, context.get("laps", MISSING))
+        self.laps = buildList(Lap, context.get("Laps", MISSING))
+
+@dataclass
+class Lap:
+
+    lapNumber: int
+    lapTime: float
+    lapSpeed: float
+    runningPosition: int
+
+    def __init__(self, context: dict):
+
+        self.lapNumber = context.get("Lap", MISSING)
+        self.lapTime = context.get("LapTime", MISSING)
+        self.lapSpeed = context.get("LapSpeed", MISSING)
+        self.runningPosition = context.get("RunningPos", MISSING)
 
 if __name__ == "__main__":
 
@@ -486,34 +500,40 @@ if __name__ == "__main__":
     # Obtaining the first DriverLaps instance given the provided race information.
     driverLaps: list = race.driverLaps
 
+    # Obtaining the first DriverLaps instance of the list.
+    specificDriverLaps: DriverLaps = driverLaps[1]
+
+    # Obtaining the second Lap instance for the first DriverLaps instance in the list. (To avoid the null values of Lap 0).
+    lap: Lap = specificDriverLaps.laps[2]
+
     # Data retrieval test.
-    # retrievalTimes: list = []
-    # for x in range(10):
+    retrievalTimes: list = []
+    for x in range(10):
 
-    #     startTime = time.time()
-    #     for year in range(2017, 2026):
+        startTime = time.time()
+        for year in range(2017, 2026):
 
-    #         for round in range(36):
+            for round in range(36):
 
-    #             # Testing data retrieval for Race objects.
-    #             try:
-    #                 testRace = Race(year, 1, round + 1)
-    #                 print(f"{year} {testRace.raceName} successfully retrieved!")
+                # Testing data retrieval for Race objects.
+                try:
+                    testRace = Race(year, 1, round + 1)
+                    print(f"{year} {testRace.raceName} successfully retrieved!")
 
-    #                 # Testing data retrieval for PitStops objects.
-    #                 try:
-    #                     testPitStops = race.pitStops
-    #                     print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
+                    # Testing data retrieval for PitStops objects.
+                    try:
+                        testPitStops = race.pitStops
+                        print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
                     
-    #                 except Exception as ex:
-    #                     print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+                    except Exception as ex:
+                        print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
 
-    #             except Exception as ex:
-    #                 print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+                except Exception as ex:
+                    print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
-    #     endTime = time.time()
-    #     print(f"Data retrieval took {endTime - startTime} seconds.")
-    #     retrievalTimes.append(endTime - startTime)
+        endTime = time.time()
+        print(f"Data retrieval took {endTime - startTime} seconds.")
+        retrievalTimes.append(endTime - startTime)
     
     # print(retrievalTimes)
 
@@ -696,9 +716,18 @@ if __name__ == "__main__":
     #endregion
 
     #region DriverLaps data retrieval properties.
-    specificDriverLaps: DriverLaps = driverLaps[0]
-    print(specificDriverLaps.carNumber)
-    print(specificDriverLaps.fullName)
-    print(specificDriverLaps.manufacturer)
-    print(specificDriverLaps.runningPosition)
-    print(specificDriverLaps.driverID)
+    # print(specificDriverLaps.carNumber)
+    # print(specificDriverLaps.fullName)
+    # print(specificDriverLaps.manufacturer)
+    # print(specificDriverLaps.runningPosition)
+    # print(specificDriverLaps.driverID)
+
+    #endregion
+
+    #region Lap data retrieval properties.
+    # print(lap.lapNumber)
+    # print(lap.lapTime)
+    # print(lap.lapSpeed)
+    # print(lap.runningPosition)
+
+    #endregion
