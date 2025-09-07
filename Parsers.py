@@ -5,12 +5,16 @@ from Constants import MISSING
 from typing import Type, Any
 
 @cache
-def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int) -> list:
+def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int, key: str = "weekend_race") -> list:
     
     url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/weekend-feed.json"
     response: json = urlopen(url)
     weekendData: list = json.loads(response.read())
-    raceInfo: dict = weekendData["weekend_race"][0]
+
+    if(key == "weekend_race"):
+        raceInfo: dict = weekendData[key][0]
+    else:
+        raceInfo: dict = weekendData[key]
 
     return raceInfo
 

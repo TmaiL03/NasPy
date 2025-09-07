@@ -61,6 +61,7 @@ class Race:
     feed: "Feed"
     pitStops: list
     driverLaps: list
+    sessions: list
 
     def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
 
@@ -170,6 +171,7 @@ class Race:
         self.feed = Feed(self.season, self.seriesID, self.raceID)
         self.pitStops = buildList(PitStop, parseLivePitDataURL(self.seriesID, self.raceID))
         self.driverLaps = buildList(DriverLaps, parseLapTimesURL(self.season, self.seriesID, self.raceID))
+        self.sessions = buildList(Session, parseWeekendFeedURL(self.season, self.seriesID, self.raceID, "weekend_runs"))
 
         #endregion
 
@@ -186,20 +188,20 @@ class Feed:
 
     def __init__(self, raceSeason: int, seriesID: int, raceID: int):
         
-        self.raceInfo = parseWeekendFeedURL(raceSeason, seriesID, raceID)
+        raceInfo = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
         # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
-        self.stage4Laps = self.raceInfo.get("stage_4_laps", MISSING)
+        self.stage4Laps = raceInfo.get("stage_4_laps", MISSING)
         
-        self.results = buildList(Result, self.raceInfo.get("results", MISSING))
-        self.cautionSegments = buildList(Caution, self.raceInfo.get("caution_segments", MISSING))
-        self.raceLeaders = buildList(Leader, self.raceInfo.get("race_leaders", MISSING))
+        self.results = buildList(Result, raceInfo.get("results", MISSING))
+        self.cautionSegments = buildList(Caution, raceInfo.get("caution_segments", MISSING))
+        self.raceLeaders = buildList(Leader, raceInfo.get("race_leaders", MISSING))
 
         # Introduced during 2020 season (will need to handle specific logic for races prior to).
-        self.stages = buildList(Stage, self.raceInfo.get("stage_results", MISSING))
+        self.stages = buildList(Stage, raceInfo.get("stage_results", MISSING))
 
         # Introduced for round 7 of the 2020 season.
-        self.pitReports = self.raceInfo.get("pit_reports", MISSING)
+        self.pitReports = raceInfo.get("pit_reports", MISSING)
 
 @dataclass
 class Event:
@@ -473,10 +475,37 @@ class Lap:
         self.lapSpeed = context.get("LapSpeed", MISSING)
         self.runningPosition = context.get("RunningPos", MISSING)
 
+@dataclass
+class Session:
+
+    weekendRunID: int
+    raceID: int
+    timingRunID: int
+    runType: int
+    runName: str
+    runDate: datetime.datetime
+    runDateUTC: datetime.datetime
+    results: list
+
+    def __init__(self, context: dict):
+
+        self.weekendRunID = context.get("weekend_run_id", MISSING)
+        self.raceID = context.get("race_id", MISSING)
+        self.timingRunID = context.get("timing_run_id", MISSING)
+        self.runType = context.get("run_type", MISSING)
+        self.runName = context.get("run_name", MISSING)
+        self.runDate = context.get("run_date", MISSING)
+        self.runDateUTC = context.get("run_date_utc", MISSING)
+        # self.results = buildList(SessionResult, sessionInfo.get("results", MISSING))
+
+# @dataclass
+# class SessionResult:
+#     pass
+
 if __name__ == "__main__":
 
     # Test instantiation of Race object and nested objects.
-    race = Race(2025, 1, 1)
+    race = Race(2025, 1, 2)
     # print(race.raceID)
 
     # Obtaining first place information from the provided Race instance.
@@ -504,36 +533,39 @@ if __name__ == "__main__":
     specificDriverLaps: DriverLaps = driverLaps[1]
 
     # Obtaining the second Lap instance for the first DriverLaps instance in the list. (To avoid the null values of Lap 0).
-    lap: Lap = specificDriverLaps.laps[2]
+    lap: Lap = specificDriverLaps.laps[1]
+
+    # Obtaining the first Session instance of the provided Race instance.
+    session: Session = race.sessions[0]
 
     # Data retrieval test.
-    retrievalTimes: list = []
-    for x in range(10):
+    # retrievalTimes: list = []
+    # for x in range(10):
 
-        startTime = time.time()
-        for year in range(2017, 2026):
+    #     startTime = time.time()
+    #     for year in range(2017, 2026):
 
-            for round in range(36):
+    #         for round in range(36):
 
-                # Testing data retrieval for Race objects.
-                try:
-                    testRace = Race(year, 1, round + 1)
-                    print(f"{year} {testRace.raceName} successfully retrieved!")
+    #             # Testing data retrieval for Race objects.
+    #             try:
+    #                 testRace = Race(year, 1, round + 1)
+    #                 print(f"{year} {testRace.raceName} successfully retrieved!")
 
-                    # Testing data retrieval for PitStops objects.
-                    try:
-                        testPitStops = race.pitStops
-                        print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
+    #                 # Testing data retrieval for PitStops objects.
+    #                 try:
+    #                     testPitStops = race.pitStops
+    #                     print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
                     
-                    except Exception as ex:
-                        print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+    #                 except Exception as ex:
+    #                     print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
 
-                except Exception as ex:
-                    print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+    #             except Exception as ex:
+    #                 print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
-        endTime = time.time()
-        print(f"Data retrieval took {endTime - startTime} seconds.")
-        retrievalTimes.append(endTime - startTime)
+    #     endTime = time.time()
+    #     print(f"Data retrieval took {endTime - startTime} seconds.")
+    #     retrievalTimes.append(endTime - startTime)
     
     # print(retrievalTimes)
 
@@ -731,3 +763,13 @@ if __name__ == "__main__":
     # print(lap.runningPosition)
 
     #endregion
+
+    #region Session data retrieval properties.
+    print(session.weekendRunID)
+    print(session.raceID)
+    print(session.timingRunID)
+    print(session.runType)
+    print(session.runName)
+    print(session.runDate)
+    print(session.runDateUTC)
+    # print(session.results)
