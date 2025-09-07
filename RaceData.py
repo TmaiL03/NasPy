@@ -3,9 +3,9 @@ Holds NASCAR race performance data and all associated classes and methods for ac
 '''
 
 from urllib.request import urlopen
-import json, datetime, time
+import datetime, time
 from dataclasses import dataclass
-from Parsers import parseWeekendFeedURL, parseLivePitDataURL, parseLapTimesURL, buildList
+from Parsers import parseRaceListBasicURL, parseWeekendFeedURL, parseLivePitDataURL, parseLapTimesURL, buildList
 from Constants import MISSING
 
 @dataclass
@@ -69,10 +69,7 @@ class Race:
         self.seriesID = seriesID
         self.round = round
 
-        url: str = f"https://cf.nascar.com/cacher/{season}/race_list_basic.json"
-        response: json = urlopen(url)
-        races: list = json.loads(response.read())
-        seriesRaces: list = races[f"series_{self.seriesID}"]
+        seriesRaces: list = parseRaceListBasicURL(season, seriesID)
         raceIndex: int = 0
 
 
@@ -190,18 +187,27 @@ class Feed:
         
         raceInfo = parseWeekendFeedURL(raceSeason, seriesID, raceID)
 
-        # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
-        self.stage4Laps = raceInfo.get("stage_4_laps", MISSING)
+        if raceInfo is not MISSING:
+            # Introduced for round 7 of 2020 season, then for each race thereafter starting with the last two rounds of the same year.
+            self.stage4Laps = raceInfo.get("stage_4_laps", MISSING)
+            
+            self.results = buildList(Result, raceInfo.get("results", MISSING))
+            self.cautionSegments = buildList(Caution, raceInfo.get("caution_segments", MISSING))
+            self.raceLeaders = buildList(Leader, raceInfo.get("race_leaders", MISSING))
+
+            # Introduced during 2020 season (will need to handle specific logic for races prior to).
+            self.stages = buildList(Stage, raceInfo.get("stage_results", MISSING))
+
+            # Introduced for round 7 of the 2020 season.
+            self.pitReports = raceInfo.get("pit_reports", MISSING)
         
-        self.results = buildList(Result, raceInfo.get("results", MISSING))
-        self.cautionSegments = buildList(Caution, raceInfo.get("caution_segments", MISSING))
-        self.raceLeaders = buildList(Leader, raceInfo.get("race_leaders", MISSING))
-
-        # Introduced during 2020 season (will need to handle specific logic for races prior to).
-        self.stages = buildList(Stage, raceInfo.get("stage_results", MISSING))
-
-        # Introduced for round 7 of the 2020 season.
-        self.pitReports = raceInfo.get("pit_reports", MISSING)
+        else:
+            self.stage4Laps = MISSING
+            self.results = MISSING
+            self.cautionSegments = MISSING
+            self.raceLeaders = MISSING
+            self.stages = MISSING
+            self.pitReports = MISSING
 
 @dataclass
 class Event:
@@ -496,16 +502,47 @@ class Session:
         self.runName = context.get("run_name", MISSING)
         self.runDate = context.get("run_date", MISSING)
         self.runDateUTC = context.get("run_date_utc", MISSING)
-        # self.results = buildList(SessionResult, sessionInfo.get("results", MISSING))
+        self.results = buildList(SessionResult, context.get("results", MISSING))
 
-# @dataclass
-# class SessionResult:
-#     pass
+@dataclass
+class SessionResult:
+    
+    runID: int
+    carNumber: str
+    vehicleNumber: str
+    manufacturer: str
+    driverID: int
+    driverName: str
+    finishingPosition: int
+    bestLapTime: float
+    bestLapSpeed: float
+    bestLapNumber: int
+    lapsCompleted: int
+    comment: str
+    deltaLeader: float
+    disqualified: bool
+
+    def __init__(self, context: dict):
+
+        self.runID = context.get("run_id", MISSING)
+        self.carNumber = context.get("car_number", MISSING)
+        self.vehicleNumber = context.get("vehicle_number", MISSING)
+        self.manufacturer = context.get("manufacturer", MISSING)
+        self.driverID = context.get("driver_id", MISSING)
+        self.driverName = context.get("driver_name", MISSING)
+        self.finishingPosition = context.get("finishing_position", MISSING)
+        self.bestLapTime = context.get("best_lap_time", MISSING)
+        self.bestLapSpeed = context.get("best_lap_speed", MISSING)
+        self.bestLapNumber = context.get("best_lap_number", MISSING)
+        self.lapsCompleted = context.get("laps_completed", MISSING)
+        self.comment = context.get("comment", MISSING)
+        self.deltaLeader = context.get("delta_leader", MISSING)
+        self.disqualified = context.get("disqualified", MISSING)
 
 if __name__ == "__main__":
 
     # Test instantiation of Race object and nested objects.
-    race = Race(2025, 1, 2)
+    race = Race(2025, 1, 1)
     # print(race.raceID)
 
     # Obtaining first place information from the provided Race instance.
@@ -537,6 +574,9 @@ if __name__ == "__main__":
 
     # Obtaining the first Session instance of the provided Race instance.
     session: Session = race.sessions[0]
+
+    # Obtaining the first SessionResult instance of the provided Session instance.
+    sessionResult: SessionResult = session.results[0]
 
     # Data retrieval test.
     # retrievalTimes: list = []
@@ -765,11 +805,30 @@ if __name__ == "__main__":
     #endregion
 
     #region Session data retrieval properties.
-    print(session.weekendRunID)
-    print(session.raceID)
-    print(session.timingRunID)
-    print(session.runType)
-    print(session.runName)
-    print(session.runDate)
-    print(session.runDateUTC)
-    # print(session.results)
+    # print(session.weekendRunID)
+    # print(session.raceID)
+    # print(session.timingRunID)
+    # print(session.runType)
+    # print(session.runName)
+    # print(session.runDate)
+    # print(session.runDateUTC)
+
+    #endregion
+
+    #region SessionResult data retrieval properties.
+    # print(sessionResult.runID)
+    # print(sessionResult.carNumber)
+    # print(sessionResult.vehicleNumber)
+    # print(sessionResult.manufacturer)
+    # print(sessionResult.driverID)
+    # print(sessionResult.driverName)
+    # print(sessionResult.finishingPosition)
+    # print(sessionResult.bestLapTime)
+    # print(sessionResult.bestLapSpeed)
+    # print(sessionResult.bestLapNumber)
+    # print(sessionResult.lapsCompleted)
+    # print(sessionResult.comment)
+    # print(sessionResult.deltaLeader)
+    # print(sessionResult.disqualified)
+    
+    #endregion
