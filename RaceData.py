@@ -501,22 +501,25 @@ class LapNote:
         self.lapNumber = lapNumber
 
         lapData: dict = parseLapNotesURL(raceSeason, seriesID, raceID)
-        notes: list = lapData.get(str(lapNumber), MISSING)
-        
-        if notes is not MISSING:
+
+        if lapData is not MISSING:
             
-            # Will want to implement logic to handle multiple notes for a single lap (where applicable).
-            self.flagState = notes[0].get("FlagState", MISSING)
-            self.note = notes[0].get("Note", MISSING)
-            self.noteID = notes[0].get("NoteID", MISSING)
-            self.driverIDs = notes[0].get("DriverIDs", MISSING)
+            notes: list = lapData.get(str(lapNumber), MISSING)
         
-        else:
-            self.flagState = MISSING
-            self.note = MISSING
-            self.noteID = MISSING
-            self.driverIDs = MISSING
-            print("No lap notes available for requested lap number.")
+            if notes is not MISSING:
+                
+                # Will want to implement logic to handle multiple notes for a single lap (where applicable).
+                self.flagState = notes[0].get("FlagState", MISSING)
+                self.note = notes[0].get("Note", MISSING)
+                self.noteID = notes[0].get("NoteID", MISSING)
+                self.driverIDs = notes[0].get("DriverIDs", MISSING)
+            
+            else:
+                self.flagState = MISSING
+                self.note = MISSING
+                self.noteID = MISSING
+                self.driverIDs = MISSING
+                print("No lap notes available for requested lap number.")
 
 @dataclass
 class Session:
@@ -619,33 +622,39 @@ if __name__ == "__main__":
     lapNote: LapNote = LapNote(race.season, race.seriesID, race.raceID, 2)
 
     # Data retrieval test.
-    # retrievalTimes: list = []
-    # for x in range(10):
+    retrievalTimes: list = []
+    for x in range(10):
 
-    #     startTime = time.time()
-    #     for year in range(2017, 2026):
+        startTime = time.time()
+        for year in range(2017, 2026):
 
-    #         for round in range(36):
+            for round in range(36):
 
-    #             # Testing data retrieval for Race objects.
-    #             try:
-    #                 testRace = Race(year, 1, round + 1)
-    #                 print(f"{year} {testRace.raceName} successfully retrieved!")
+                # Testing data retrieval for Race objects.
+                try:
+                    testRace = Race(year, 1, round + 1)
+                    print(f"{year} {testRace.raceName} successfully retrieved!")
 
-    #                 # Testing data retrieval for PitStops objects.
-    #                 try:
-    #                     testPitStops = race.pitStops
-    #                     print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
+                    # Testing data retrieval for PitStops objects.
+                    try:
+                        testPitStops = race.pitStops
+                        print(f"Pit stops for {year} {testRace.raceName} successfully retrieved!")
                     
-    #                 except Exception as ex:
-    #                     print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+                    except Exception as ex:
+                        print(f"{type(ex).__name__}: {ex.args}. Pit stops for ({year}, {round + 1}) were not retrieved.")
+                    
+                    try:
+                        lapNote: LapNote = LapNote(year, 1, testRace.raceID, 0)
+                    
+                    except Exception as ex:
+                        print(f"{type(ex).__name__}: {ex.args}. Lap note for ({year}, {round + 1}, 0) was not retrieved.")
 
-    #             except Exception as ex:
-    #                 print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
+                except Exception as ex:
+                    print(f"{type(ex).__name__}: {ex.args}. Race ({year}, {round + 1}) was not retrieved.")
 
-    #     endTime = time.time()
-    #     print(f"Data retrieval took {endTime - startTime} seconds.")
-    #     retrievalTimes.append(endTime - startTime)
+        endTime = time.time()
+        print(f"Data retrieval took {endTime - startTime} seconds.")
+        retrievalTimes.append(endTime - startTime)
     
     # print(retrievalTimes)
 

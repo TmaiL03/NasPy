@@ -83,12 +83,18 @@ def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
 @cache
 def parseLapNotesURL(raceSeason: int, seriesID: int, raceID: int) -> dict:
 
-    url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/lap-notes.json"
-    response: json = urlopen(url)
-    lapNotesData: dict = json.loads(response.read())
-    lapNotes: dict = lapNotesData["laps"]
+    try:
+        url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/lap-notes.json"
+        response: json = urlopen(url)
+        lapNotesData: dict = json.loads(response.read())
+        lapNotes: dict = lapNotesData["laps"]
 
-    return lapNotes
+        return lapNotes
+    
+    except HTTPError as ex:
+        print(f"HTTPError: {ex}. Unable to retrieve data from {url}.")
+
+        return MISSING
 
 # Used for building lists of data objects of the specified class type using the provided context.
 def buildList(cls: Type[Any], dataCollection: dict | list | object) -> list | object:
