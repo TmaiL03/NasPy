@@ -59,6 +59,7 @@ def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
         
         return MISSING
 
+@cache
 def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
 
     try:
@@ -78,6 +79,16 @@ def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
         print(f"KeyError: {ex}. The key 'laps' was not found in the JSON data of {url}.")
         
         return MISSING
+    
+@cache
+def parseLapNotesURL(raceSeason: int, seriesID: int, raceID: int) -> dict:
+
+    url: str = f"https://cf.nascar.com/cacher/{raceSeason}/{seriesID}/{raceID}/lap-notes.json"
+    response: json = urlopen(url)
+    lapNotesData: dict = json.loads(response.read())
+    lapNotes: dict = lapNotesData["laps"]
+
+    return lapNotes
 
 # Used for building lists of data objects of the specified class type using the provided context.
 def buildList(cls: Type[Any], dataCollection: dict | list | object) -> list | object:
