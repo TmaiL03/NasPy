@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from Parsers import *
-from Constants import MISSING
-from Lap import Lap
+from Helpers.Parsers import *
+from Helpers.Constants import MISSING
+from datamodels.Lap import Lap
 
 @dataclass
 class DriverLaps:

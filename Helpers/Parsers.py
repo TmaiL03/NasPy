@@ -2,7 +2,7 @@ from urllib.error import HTTPError
 from urllib.request import urlopen
 import json
 from functools import cache
-from Constants import MISSING
+from Helpers.Constants import MISSING
 from typing import Type, Any
 
 @cache

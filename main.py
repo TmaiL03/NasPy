@@ -1,17 +1,17 @@
 import time
 
-from Caution import Caution
-from DriverLaps import DriverLaps
-from Event import Event
-from Lap import Lap
-from LapNote import LapNote
-from Leader import Leader
-from Race import Race
-from Result import Result
-from Session import Session
-from SessionResult import SessionResult
-from Stage import Stage
-from StageFinisher import StageFinisher
+from datamodels.Caution import Caution
+from datamodels.DriverLaps import DriverLaps
+from datamodels.Event import Event
+from datamodels.Lap import Lap
+from datamodels.LapNote import LapNote
+from datamodels.Leader import Leader
+from datamodels.Race import Race
+from datamodels.Result import Result
+from datamodels.Session import Session
+from datamodels.SessionResult import SessionResult
+from datamodels.Stage import Stage
+from datamodels.StageFinisher import StageFinisher
 
 if __name__ == "__main__":
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # Obtaining the LapNote instance for lap 1 of the provided Race instance.
     lapNote: LapNote = LapNote(race.season, race.seriesID, race.raceID, 2)
 
-    # Data retrieval test.
+    # Data retrieval datamodels.
     retrievalTimes: list = []
     for x in range(10):
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from Parsers import *
-from Constants import MISSING
+from Helpers.Parsers import *
+from Helpers.Constants import MISSING
 
 @dataclass
 class LapNote:

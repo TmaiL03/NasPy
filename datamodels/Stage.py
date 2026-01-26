@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from Parsers import *
-from Constants import MISSING
-from StageFinisher import StageFinisher
+from Helpers.Parsers import *
+from Helpers.Constants import MISSING
+from datamodels.StageFinisher import StageFinisher
 
 @dataclass
 class Stage:

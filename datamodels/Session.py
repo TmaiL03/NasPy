@@ -1,8 +1,8 @@
 import datetime
 from dataclasses import dataclass
-from Parsers import *
-from Constants import MISSING
-from SessionResult import SessionResult
+from Helpers.Parsers import *
+from Helpers.Constants import MISSING
+from datamodels.SessionResult import SessionResult
 
 @dataclass
 class Session:

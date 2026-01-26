@@ -1,12 +1,12 @@
 import datetime, time
 from dataclasses import dataclass
-from Parsers import *
-from Constants import MISSING
-from Feed import Feed
-from Event import Event
-from PitStop import PitStop
-from DriverLaps import DriverLaps
-from Session import Session
+from Helpers.Parsers import *
+from Helpers.Constants import MISSING
+from datamodels.Feed import Feed
+from datamodels.Event import Event
+from datamodels.PitStop import PitStop
+from datamodels.DriverLaps import DriverLaps
+from datamodels.Session import Session
 
 @dataclass
 class Race:
