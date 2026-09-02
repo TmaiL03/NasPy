@@ -60,7 +60,7 @@ if __name__ == "__main__":
     for x in range(10):
 
         startTime = time.time()
-        for year in range(2018, 2026):
+        for year in range(2026, 2027):
 
             for round in range(36):
 
