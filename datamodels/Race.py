@@ -7,7 +7,7 @@ from helpers.Constants import MISSING
 from datamodels.Feed import Feed
 from datamodels.Event import Event
 from datamodels.PitStop import PitStop
-from datamodels.DriverLaps import DriverLaps
+from datamodels.DriverLapsBatch import DriverLapsBatch
 from datamodels.Session import Session
 
 @dataclass
@@ -61,7 +61,7 @@ class Race(Tupleable):
     poleWinnerLaptime: time.struct_time
     feed: "Feed"
     pitStops: list
-    driverLaps: list
+    driverLapsBatch: list
     sessions: list
 
     def __init__(self, season: int, seriesID: int, round: int, includeExhibitions: bool = False):
@@ -167,7 +167,7 @@ class Race(Tupleable):
         self.poleWinnerLaptime = seriesRaces[raceIndex].get("pole_winner_laptime", MISSING)
         self.feed = Feed(self.season, self.seriesID, self.raceID)
         self.pitStops = buildList(PitStop, parseLivePitDataURL(self.seriesID, self.raceID))
-        self.driverLaps = buildList(DriverLaps, parseLapTimesURL(self.season, self.seriesID, self.raceID))
+        self.driverLapsBatch = buildList(DriverLapsBatch, parseLapTimesURL(self.season, self.seriesID, self.raceID))
         self.sessions = buildList(Session, parseWeekendFeedURL(self.season, self.seriesID, self.raceID, "weekend_runs"))
 
         # endregion

@@ -1,7 +1,7 @@
 import time
 
 from datamodels.Caution import Caution
-from datamodels.DriverLaps import DriverLaps
+from datamodels.DriverLapsBatch import DriverLapsBatch
 from datamodels.Event import Event
 from datamodels.Lap import Lap
 from datamodels.LapNote import LapNote
@@ -38,10 +38,10 @@ if __name__ == "__main__":
     stageFinisher: StageFinisher = stage.results[0]
 
     # Obtaining the first DriverLaps instance given the provided race information.
-    driverLaps: list = race.driverLaps
+    driverLaps: list = race.driverLapsBatch
 
     # Obtaining the first DriverLaps instance of the list.
-    specificDriverLaps: DriverLaps = driverLaps[1]
+    specificDriverLaps: DriverLapsBatch = driverLaps[1]
 
     # Obtaining the second Lap instance for the first DriverLaps instance in the list. (To avoid the null values of Lap 0).
     lap: Lap = specificDriverLaps.laps[1]

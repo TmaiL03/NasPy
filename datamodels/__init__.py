@@ -1,6 +1,6 @@
 __all__ = [
     "Caution",
-    "DriverLaps",
+    "DriverLapsBatch",
     "Event",
     "Feed",
     "Lap",

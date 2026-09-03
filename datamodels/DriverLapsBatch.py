@@ -4,7 +4,7 @@ from helpers.Constants import MISSING
 from datamodels.Lap import Lap
 
 @dataclass
-class DriverLaps:
+class DriverLapsBatch:
 
     carNumber: str
     fullName: str
