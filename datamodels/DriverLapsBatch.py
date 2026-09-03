@@ -1,10 +1,12 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Parsers import *
 from helpers.Constants import MISSING
 from datamodels.Lap import Lap
 
 @dataclass
-class DriverLapsBatch:
+class DriverLapsBatch(Tupleable):
 
     carNumber: str
     fullName: str
@@ -21,3 +23,13 @@ class DriverLapsBatch:
         self.runningPosition = context.get("RunningPos", MISSING)
         self.driverID = context.get("NASCARDriverID", MISSING)
         self.laps = buildList(Lap, context.get("Laps", MISSING))
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.carNumber,
+            self.fullName,
+            self.manufacturer,
+            self.runningPosition,
+            self.driverID
+        )

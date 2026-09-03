@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
 
 @dataclass
-class Lap:
+class Lap(Tupleable):
 
     lapNumber: int
     lapTime: float
@@ -15,3 +17,12 @@ class Lap:
         self.lapTime = context.get("LapTime", MISSING)
         self.lapSpeed = context.get("LapSpeed", MISSING)
         self.runningPosition = context.get("RunningPos", MISSING)
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.lapNumber,
+            self.lapTime,
+            self.lapSpeed,
+            self.runningPosition
+        )
