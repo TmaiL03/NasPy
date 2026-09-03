@@ -5,7 +5,7 @@ from functools import cache
 from helpers.Constants import MISSING
 from typing import Type, Any
 
-@cache
+# @cache
 def parseRaceListBasicURL(raceSeason: int, seriesID: int) -> list:
 
     try:
@@ -19,7 +19,7 @@ def parseRaceListBasicURL(raceSeason: int, seriesID: int) -> list:
     except HTTPError as ex:
         raise Exception(f"Unable to retrieve data for season '{raceSeason}' from {url}.")
 
-@cache
+# @cache
 def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int, key: str = "weekend_race") -> list:
     
     try:
@@ -44,7 +44,7 @@ def parseWeekendFeedURL(raceSeason: int, seriesID: int, raceID: int, key: str = 
         
         return MISSING
 
-@cache
+# @cache
 def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
 
     try:
@@ -59,7 +59,7 @@ def parseLivePitDataURL(seriesID: int, raceID: int) -> list:
         
         return MISSING
 
-@cache
+# @cache
 def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
 
     try:
@@ -80,7 +80,7 @@ def parseLapTimesURL(raceSeason: int, seriesID: int, raceID: int) -> list:
         
         return MISSING
     
-@cache
+# @cache
 def parseLapNotesURL(raceSeason: int, seriesID: int, raceID: int) -> dict:
 
     try:
