@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
 
 @dataclass
-class Result:
+class Result(Tupleable):
     resultID: int
     finishingPosition: int
     startingPosition: int
@@ -95,8 +97,54 @@ class Result:
         # Introduced during the 2020 season.
         self.disqualified = context.get("disqualified", MISSING)
 
+        self.diffLaps = context.get("diff_laps", MISSING)
+
         # Introduced during the 2020 season (Not for the Clash, but for the Duels).
         self.diffTime = context.get("diff_time", MISSING)  # Returned value in milliseconds.
 
         # Introduced for round <tbd> of the <tbd> season (need to go back to identify when this key was introduced).
         self.pitBox = context.get("pit_box", MISSING)
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.resultID,
+            self.finishingPosition,
+            self.startingPosition,
+            self.carNumber,
+            self.driverFullName,
+            self.driverID,
+            self.driverHometown,
+            self.hometownCity,
+            self.hometownState,
+            self.hometownCountry,
+            self.teamID,
+            self.teamName,
+            self.qualifyingOrder,
+            self.qualifyingPosition,
+            self.qualifyingSpeed,
+            self.lapsLed,
+            self.timesLed,
+            self.carMake,
+            self.carModel,
+            self.sponsor,
+            self.pointsEarned,
+            self.playoffPointsEarned,
+            self.lapsCompleted,
+            self.finishingStatus,
+            self.winnings,
+            self.seriesID,
+            self.raceSeason,
+            self.raceID,
+            self.ownerFullName,
+            self.crewChiefID,
+            self.crewChiefFullName,
+            self.pointsPosition,
+            self.pointsDelta,
+            self.ownerID,
+            self.officialCarNumber,
+            self.disqualified,
+            self.diffLaps,
+            self.diffTime,
+            self.pitBox,
+        )

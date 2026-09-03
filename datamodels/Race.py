@@ -1,6 +1,5 @@
 import datetime, time
 from dataclasses import dataclass
-from typing import Tuple
 
 from datamodels.Tupleable import Tupleable
 from helpers.Parsers import *
@@ -173,7 +172,7 @@ class Race(Tupleable):
 
         # endregion
 
-    def toTuple(self) -> Tuple:
+    def toTuple(self) -> tuple:
         return (self.season,
                 self.seriesID,
                 self.round,

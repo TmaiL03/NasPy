@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from typing import Tuple
 
 from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
@@ -20,7 +19,7 @@ class Event(Tupleable):
         self.startTime = context.get("start_time_utc", MISSING)
         self.runType = context.get("run_type", MISSING)
 
-    def toTuple(self) -> Tuple:
+    def toTuple(self) -> tuple:
 
         return (
             self.eventName,

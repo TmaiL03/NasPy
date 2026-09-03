@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
 
 @dataclass
-class Caution:
+class Caution(Tupleable):
 
     raceID: int
     startLap: int
@@ -21,3 +23,15 @@ class Caution:
         self.comment = context.get("comment", MISSING)
         self.beneficiary = context.get("beneficiary_car_number", MISSING)
         self.flagState = context.get("flag_state", MISSING)
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.raceID,
+            self.startLap,
+            self.endLap,
+            self.reason,
+            self.comment,
+            self.beneficiary,
+            self.flagState
+        )

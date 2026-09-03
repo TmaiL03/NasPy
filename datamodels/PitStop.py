@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
 
 @dataclass
-class PitStop:
+class PitStop(Tupleable):
     vehicleNumber: str
     driverName: str
     vehicleManufacturer: str
@@ -55,3 +57,33 @@ class PitStop:
         self.pitInRank = context.get("pit_in_rank", MISSING)
         self.pitOutRank = context.get("pit_out_rank", MISSING)
         self.positionsGainedLost = context.get("positions_gained_lost", MISSING)
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.vehicleNumber,
+            self.driverName,
+            self.vehicleManufacturer,
+            self.leaderLap,
+            self.lapCount,
+            self.pitInFlagStatus,
+            self.pitOutFlagStatus,
+            self.pitInRaceTime,
+            self.pitOutRaceTime,
+            self.totalDuration,
+            self.boxStopRaceTime,
+            self.boxLeaveRaceTime,
+            self.pitStopDuration,
+            self.inTravelDuration,
+            self.outTravelDuration,
+            self.pitStopType,
+            self.leftFrontTireChanged,
+            self.leftRearTireChanged,
+            self.rightFrontTireChanged,
+            self.rightRearTireChanged,
+            self.previousLapTime,
+            self.nextLapTime,
+            self.pitInRank,
+            self.pitOutRank,
+            self.positionsGainedLost
+        )

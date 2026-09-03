@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Constants import MISSING
 
 @dataclass
-class SessionResult:
+class SessionResult(Tupleable):
     runID: int
     carNumber: str
     vehicleNumber: str
@@ -33,3 +35,22 @@ class SessionResult:
         self.comment = context.get("comment", MISSING)
         self.deltaLeader = context.get("delta_leader", MISSING)
         self.disqualified = context.get("disqualified", MISSING)
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.runID,
+            self.carNumber,
+            self.vehicleNumber,
+            self.manufacturer,
+            self.driverID,
+            self.driverName,
+            self.finishingPosition,
+            self.bestLapTime,
+            self.bestLapSpeed,
+            self.bestLapNumber,
+            self.lapsCompleted,
+            self.comment,
+            self.deltaLeader,
+            self.disqualified
+        )

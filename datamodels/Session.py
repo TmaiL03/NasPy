@@ -1,11 +1,13 @@
 import datetime
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Parsers import *
 from helpers.Constants import MISSING
 from datamodels.SessionResult import SessionResult
 
 @dataclass
-class Session:
+class Session(Tupleable):
 
     weekendRunID: int
     raceID: int
@@ -26,3 +28,15 @@ class Session:
         self.runDate = context.get("run_date", MISSING)
         self.runDateUTC = context.get("run_date_utc", MISSING)
         self.results = buildList(SessionResult, context.get("results", MISSING))
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.weekendRunID,
+            self.raceID,
+            self.timingRunID,
+            self.runType,
+            self.runName,
+            self.runDate,
+            self.runDateUTC
+        )

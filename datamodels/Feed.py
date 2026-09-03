@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+
+from datamodels.Tupleable import Tupleable
 from helpers.Parsers import *
 from helpers.Constants import MISSING
 
@@ -8,7 +10,7 @@ from datamodels.Leader import Leader
 from datamodels.Stage import Stage
 
 @dataclass
-class Feed:
+class Feed(Tupleable):
     raceInfo: dict
     stage4Laps: int
     results: list
@@ -42,3 +44,9 @@ class Feed:
             self.raceLeaders = MISSING
             self.stages = MISSING
             self.pitReports = MISSING
+
+    def toTuple(self) -> tuple:
+
+        return (
+            self.stage4Laps,
+        )
