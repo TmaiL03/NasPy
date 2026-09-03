@@ -1,5 +1,8 @@
 import datetime, time
 from dataclasses import dataclass
+from typing import Tuple
+
+from datamodels.Tupleable import Tupleable
 from helpers.Parsers import *
 from helpers.Constants import MISSING
 from datamodels.Feed import Feed
@@ -9,7 +12,7 @@ from datamodels.DriverLaps import DriverLaps
 from datamodels.Session import Session
 
 @dataclass
-class Race:
+class Race(Tupleable):
     season: int
     seriesID: int
     round: int
@@ -169,3 +172,51 @@ class Race:
         self.sessions = buildList(Session, parseWeekendFeedURL(self.season, self.seriesID, self.raceID, "weekend_runs"))
 
         # endregion
+
+    def toTuple(self) -> Tuple:
+        return (self.season,
+                self.seriesID,
+                self.round,
+                self.raceID,
+                self.raceName,
+                self.raceTypeID,
+                self.restrictorPlate,
+                self.trackID,
+                self.trackName,
+                self.dateScheduled,
+                self.raceDate,
+                self.qualifyingDate,
+                self.tuneInDate,
+                self.scheduledDistance,
+                self.actualDistance,
+                self.scheduledLaps,
+                self.actualLaps,
+                self.stage1Laps,
+                self.stage2Laps,
+                self.stage3Laps,
+                self.carCount,
+                self.poleWinnerDriverID,
+                self.poleWinnerSpeed,
+                self.numberOfLeadChanges,
+                self.numberOfLeaders,
+                self.numberOfCautions,
+                self.numberOfCautionLaps,
+                self.averageSpeed,
+                self.totalRaceTime,
+                self.marginOfVictory,
+                self.racePurse,
+                self.raceComments,
+                self.attendance,
+                str(self.infractions),
+                self.radioBroadcaster,
+                self.tvBroadcaster,
+                self.satelliteRadioBroadcaster,
+                self.masterRaceID,
+                self.inspectionComplete,
+                self.playoffRound,
+                self.isQualifyingRace,
+                self.qualifyingRaceNo,
+                self.qualifyingRaceID,
+                self.hasQualifying,
+                self.winnerDriverID,
+                self.poleWinnerLaptime)
