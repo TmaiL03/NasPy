@@ -2,6 +2,8 @@ from urllib.error import HTTPError
 from urllib.request import urlopen
 import json
 from functools import cache
+
+from datamodels.LapNote import LapNote
 from helpers.Constants import MISSING
 from typing import Type, Any
 
@@ -109,3 +111,23 @@ def buildList(cls: Type[Any], dataCollection: dict | list | object) -> list | ob
             objectList.append(cls(dataObject))
         
         return objectList
+
+def buildLapNoteList(raceSeason: int, seriesID: int, raceID: int) -> list:
+
+    lapData: dict = parseLapNotesURL(raceSeason, seriesID, raceID)
+    builtLapNotes: list = []
+
+    if lapData is not MISSING:
+
+        for lapNumber in lapData.keys():
+
+            lapNotes: list = lapData.get(str(lapNumber), MISSING)
+
+            if lapNotes is not MISSING:
+
+                for note in lapNotes:
+
+                    lapNote = LapNote(raceSeason, seriesID, raceID, lapNumber, note)
+                    builtLapNotes.append(lapNote)
+
+    return builtLapNotes
