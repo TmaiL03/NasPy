@@ -130,4 +130,10 @@ def buildLapNoteList(raceSeason: int, seriesID: int, raceID: int) -> list:
                     lapNote = LapNote(raceSeason, seriesID, raceID, lapNumber, note)
                     builtLapNotes.append(lapNote)
 
+            else:
+                print(f"No lap notes found for '{raceSeason} - {seriesID} - {raceID}' lap {lapNumber}.")
+
+    else:
+        print(f"No lap data could be located for race '{raceSeason} - {seriesID} - {raceID}.'")
+
     return builtLapNotes
